@@ -2,17 +2,16 @@
 title: "Mastering Big Data & Databases with R: A Comprehensive, In-depth, and Interactive Exploration"
 author: "Daniel Wanjala Machimbo, MSc. Candidate"
 date: "May 20, 2025 (Presentation Date)"
-output: 
+output:
   ioslides_presentation:
-    logo: logo.png   # <-- JUST THE FILENAME HERE
+    logo: "logo.png"
     widescreen: true
-    smaller: false 
-    transition: default 
-    css: styles.css 
-    # self_contained: false 
-    # lib_dir: "libs"
-# output: revealjs::revealjs_presentation 
+    smaller: false
+    transition: default
+    css: "styles.css"
 ---
+
+
 
 ```{r setup, include=FALSE}
 # This chunk runs setup code that is not shown in the presentation.
