@@ -7,7 +7,7 @@ output:
     logo: "logo.png"
     widescreen: true
     smaller: false
-    transition: default
+    transition: "default"
     css: "styles.css"
 ---
 
@@ -80,7 +80,7 @@ The term "Big Data" encapsulates data ecosystems characterized by several key at
   <li><strong>Veracity (The Quest for Truth):</strong> This refers to the quality, accuracy, and trustworthiness of data. Big Data can be messy, inconsistent, and contain biases or errors.
     <ul><li><em>Real-World Example:</em> User-generated content on review sites or social media can suffer from biases, fake reviews, or misinformation. Sensor data from IoT devices might drift over time or be affected by environmental factors, impacting its accuracy. Ensuring data veracity is critical for making reliable decisions. Data cleaning and validation are paramount.</li></ul>
   </li>
-  <li><strong>Value (The Ultimate Prize):</strong> This is arguably the most important "V." It’s about the ability to transform the vast, fast, and varied data into tangible business insights, operational efficiencies, and competitive advantages.
+  <li><strong>Value (The Ultimate Prize):</strong> This is arguably the most important "V." It's about the ability to transform the vast, fast, and varied data into tangible business insights, operational efficiencies, and competitive advantages.
     <ul><li><em>Real-World Example:</em> Netflix analyzes viewing patterns (volume, velocity, variety) of millions of subscribers to power its recommendation engine (value), significantly improving customer retention. Similarly, banks use transactional data to detect fraudulent patterns (value), saving millions.</li></ul>
   </li>
 </ul>
@@ -719,7 +719,7 @@ Achieving optimal performance when working with R and databases involves underst
     * **Efficient SQL Query Design:**
         * *Why:* Poorly written SQL can cripple performance even on well-indexed databases.
         * *Action:*
-            * Be specific: `SELECT` only the columns you actually need, not `SELECT *`.
+            * Be specific: `SELECT` only the columns you actually need, not `SELECT * `.
             * Filter early: Apply `WHERE` clauses to reduce the dataset as much as possible, as early as possible in the query.
             * Optimize joins: Ensure join conditions are on indexed columns and that join types (INNER, LEFT, etc.) are appropriate.
             * Avoid complex operations in `WHERE` clauses that prevent index usage (e.g., functions on indexed columns).
