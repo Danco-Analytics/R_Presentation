@@ -408,50 +408,48 @@ Visualizing raw, multi-million-row datasets directly is often impractical and ca
 
 Let's create some visualizations based on aggregated data from our `diamonds_tbl`.
 
-```{r dbplyr_plot_enhanced_interactive_wordy, fig.width=10, fig.height=5.5}
-# Step 1: Use dbplyr to calculate summary statistics (average price, average carat, count)
-# for each diamond 'cut'. This computation happens on the database.
-summary_stats_by_cut <- diamonds_db_ref %>%
-  group_by(cut) %>%
-  summarise(
-    average_price = mean(price, na.rm = TRUE),
-    average_carat = mean(carat, na.rm = TRUE),
-    number_of_diamonds = n()
-  ) %>%
-  # Step 2: Collect the summarized results into an R data frame.
-  collect() %>%
-  # Step 3 (Optional R-side prep): Ensure 'cut' is an ordered factor for logical plot ordering.
-  mutate(cut = factor(cut, levels = c("Fair", "Good", "Very Good", "Premium", "Ideal"))) 
+```{r interactive_density_plot, fig.width=9, fig.height=6}
+# Use ggplot2's built-in diamonds dataset
+diamonds_subset <- ggplot2::diamonds %>%
+  filter(cut %in% c("Fair", "Ideal", "Premium")) %>%
+  select(price, cut, carat)
 
-cat("Summarized data collected from database for plotting:\n")
-print(summary_stats_by_cut)
+# Make 'cut' an ordered factor
+diamonds_subset$cut <- factor(
+  diamonds_subset$cut, 
+  levels = c("Fair", "Premium", "Ideal")
+)
 
-# Plot 1: Average Diamond Price by Cut (using ggplot2, then making it interactive)
-# We add a 'text' aesthetic for custom tooltips when converted to plotly.
-plot_avg_price_gg <- ggplot(summary_stats_by_cut, 
-                            aes(x = cut, y = average_price, fill = cut,
-                                text = paste("Cut Quality:", cut, 
-                                             "<br>Avg. Price:", dollar(average_price, accuracy = 1),
-                                             "<br>Count:", number_format(accuracy=1)(number_of_diamonds)))) +
-  geom_col(show.legend = FALSE) +
-  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  scale_fill_viridis_d(option = "plasma", guide = "none") + 
-  labs(
-    title = "Average Diamond Price by Cut Quality",
-    subtitle = "Data aggregated from SQLite database via dbplyr",
-    x = "Diamond Cut Quality",
-    y = "Average Price (USD)"
+# Create ggplot
+p <- ggplot(diamonds_subset, aes(
+    x = price, 
+    fill = cut,
+    text = paste("Cut:", cut, "<br>Price:", dollar(price))
+  )) +
+  geom_density(alpha = 0.65, adjust = 1.5) +
+  scale_x_log10(
+    labels = dollar_format(prefix = "$"), 
+    breaks = c(500, 1000, 2000, 5000, 10000, 18000)
   ) +
-  theme_minimal(base_size = 13) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.title = element_text(face="bold", size=16),
-        plot.subtitle = element_text(size=11))
+  scale_fill_viridis_d(option = "magma") +
+  labs(
+    title = "Interactive Price Distribution by Diamond Cut (Log Scale)",
+    subtitle = "Density of diamond prices for selected cuts",
+    x = "Price (USD, Log Scale)",
+    y = "Density",
+    fill = "Cut"
+  ) +
+  facet_wrap(~cut, ncol = 1, scales = "free_y") +
+  theme_light(base_size = 12) +
+  theme(
+    strip.background = element_rect(fill = "grey85"),
+    strip.text = element_text(face = "bold", color = "white"),
+    plot.title = element_text(face = "bold", size = 15),
+    legend.position = "top"
+  )
 
-# Convert ggplot2 object to an interactive plotly object
-interactive_avg_price_plot <- ggplotly(plot_avg_price_gg, tooltip = "text")
-
-# Display the interactive plot
-print(interactive_avg_price_plot)
+# Convert to interactive plot
+ggplotly(p, tooltip = "text")
 ```
 
 ---
