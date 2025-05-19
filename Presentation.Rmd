@@ -4,7 +4,7 @@ author: "Daniel Wanjala Machimbo, MSc. Candidate"
 date: "May 20, 2025 (Presentation Date)"
 output: 
   ioslides_presentation:
-    logo: "your_university_logo.png" # Line 7
+    logo: logo.png   # <-- JUST THE FILENAME HERE
     widescreen: true
     smaller: false 
     transition: default 
