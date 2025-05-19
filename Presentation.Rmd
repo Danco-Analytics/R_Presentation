@@ -1,7 +1,7 @@
 ---
-title: "Mastering Big Data & Databases with R: A Comprehensive, In-depth, and Interactive Exploration"
-author: "Daniel Wanjala Machimbo, MSc. Candidate"
-date: "May 20, 2025 (Presentation Date)"
+Title: "Mastering Big Data & Databases with R: A Comprehensive, In-depth, and Interactive Exploration"
+Author: "Daniel Wanjala Machimbo, MSc. Candidate"
+Date: "May 20, 2025 (Presentation Date)"
 output: 
   ioslides_presentation:
     logo: "your_university_logo.png" 
@@ -459,48 +459,44 @@ print(interactive_avg_price_plot)
 
 Let's continue our visual exploration by examining the distribution of diamond `price`, faceted by `cut`. For such analyses, especially with prices that can span orders of magnitude, using a logarithmic scale for the price axis is often insightful. We'll fetch a relevant subset using `dbplyr` and then create an interactive density plot.
 
-```{r db_sample_and_plot_density_interactive_wordy, fig.width=9, fig.height=6}
-# Fetch data for selected cuts, focusing on price, cut, and carat.
-# This data is collected into R for client-side plotting.
-diamonds_subset_for_density <- diamonds_db_ref %>%
-  filter(cut %in% c("Fair", "Ideal", "Premium")) %>% 
-  select(price, cut, carat) %>%
-  collect() 
+```{r interactive_density_plot_fast, fig.width=9, fig.height=6}
+# Sample a smaller subset to speed up rendering
+set.seed(42)
+diamonds_subset <- ggplot2::diamonds %>%
+  filter(cut %in% c("Fair", "Ideal", "Premium")) %>%
+  sample_n(3000) %>%
+  select(price, cut, carat)
 
-# Ensure 'cut' is an ordered factor for consistent faceting and legend.
-diamonds_subset_for_density$cut <- factor(
-  diamonds_subset_for_density$cut, 
-  levels = c("Fair", "Premium", "Ideal") 
-)
+diamonds_subset$cut <- factor(diamonds_subset$cut, levels = c("Fair", "Premium", "Ideal"))
 
-# Create the density plot using ggplot2, preparing for plotly conversion.
-density_plot_gg <- ggplot(diamonds_subset_for_density, 
-                          aes(x = price, fill = cut,
-                              text = paste("Cut:", cut, "<br>Price:", dollar(price)))) +
-  geom_density(alpha = 0.65, adjust = 1.5) + # `adjust` controls smoothness
+p <- ggplot(diamonds_subset, aes(
+    x = price, 
+    fill = cut,
+    text = paste("Cut:", cut, "<br>Price:", dollar(price))
+  )) +
+  geom_density(alpha = 0.65, adjust = 1.5) +
   scale_x_log10(
-    labels = dollar_format(prefix="$", suffix="", big.mark=","), 
-    breaks = c(500, 1000, 2000, 5000, 10000, 18000) # Custom breaks for log scale
-  ) + 
+    labels = dollar_format(prefix = "$"), 
+    breaks = c(500, 1000, 2000, 5000, 10000, 18000)
+  ) +
   scale_fill_viridis_d(option = "magma") +
   labs(
-    title = "Interactive Price Distribution by Diamond Cut (Log Scale)",
-    subtitle = "Illustrating density of diamond prices for selected cuts",
-    x = "Price (USD, Logarithmic Scale)",
+    title = "Sampled Interactive Price Distribution by Diamond Cut",
+    subtitle = "Subset of 3,000 diamonds for faster rendering",
+    x = "Price (USD, Log Scale)",
     y = "Density",
-    fill = "Cut Quality"
+    fill = "Cut"
   ) +
-  facet_wrap(~cut, ncol = 1, scales = "free_y") + # Separate plot for each cut, free y-axis for better comparison of shapes
+  facet_wrap(~cut, ncol = 1, scales = "free_y") +
   theme_light(base_size = 12) +
-  theme(strip.background = element_rect(fill="grey85"),
-        strip.text = element_text(face="bold", color="white"),
-        plot.title = element_text(face="bold", size=15),
-        legend.position = "top")
+  theme(
+    strip.background = element_rect(fill = "grey85"),
+    strip.text = element_text(face = "bold", color = "white"),
+    plot.title = element_text(face = "bold", size = 15),
+    legend.position = "top"
+  )
 
-# Convert to an interactive plotly chart
-interactive_density_plot <- ggplotly(density_plot_gg, tooltip = c("x", "fill")) # Default tooltip for density can be tricky; text aesthetic can be used if specific point data is desired.
-
-print(interactive_density_plot)
+ggplotly(p, tooltip = "text")
 ```
 *Interpreting Interactive Density Plots:* These plots help visualize the shape of the price distribution for different cuts. The log scale on the x-axis helps to see variations across a wide range of prices. The `alpha` transparency allows seeing overlapping densities if they were not faceted. Interactivity (zooming, panning) allows for closer inspection of specific price ranges.
 *Real-World Example: A marketing analyst for an online electronics retailer might use similar interactive density plots to understand price distributions of different smartphone brands, helping to identify market segments and competitive pricing strategies. The data would be pulled from the company's sales database.*
