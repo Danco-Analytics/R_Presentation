@@ -1,13 +1,13 @@
 ---
-Title: "Mastering Big Data & Databases with R: A Comprehensive, In-depth, and Interactive Exploration"
-Author: "Daniel Wanjala Machimbo, MSc. Candidate"
-Date: "May 20, 2025 (Presentation Date)"
+title: "Mastering Big Data & Databases with R: A Comprehensive, In-depth, and Interactive Exploration"
+author: "Daniel Wanjala Machimbo, MSc. Candidate"
+date: "May 20, 2025 (Presentation Date)"
 output: 
   ioslides_presentation:
-    logo: "your_university_logo.png" 
+    logo: "your_university_logo.png" # Line 7
     widescreen: true
-    smaller: false # Allow for more text, adjust if too cramped
-    transition: default # Slower for readability
+    smaller: false 
+    transition: default 
     css: styles.css 
     # self_contained: false 
     # lib_dir: "libs"
