@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nehemia Ministry Kenya - Home</title>
+    <meta name="description" content="Official website for Nehemia Ministry Kenya, founded by Bishop David Walukhu and Reverend Selina Walukhu. Discover our ministries, sermons, events, and more.">
+    <meta name="keywords" content="Nehemia Ministry, Kenya, Church, Bishop David Walukhu, Reverend Selina Walukhu, Mukhonje, Kakamega, Christian, Gospel, Ministries, Sermons, Events, Orphanage, Hospital, Training Institute">
+    <meta name="author" content="Nehemia Ministry Kenya">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        primary: '#2563eb', /* A shade of blue for primary actions/branding */
+                        secondary: '#f97316', /* A shade of orange for accents */
+                        neutral: '#f3f4f6', /* Light gray for backgrounds */
+                        dark: '#1f2937', /* Dark gray for text */
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,de,fr,sw', // English, German, French, Swahili
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <style>
+        /* Custom CSS for general styling and overrides */
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #1f2937; /* dark text */
+            background-color: #ffffff; /* white background */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            color: #1f2937;
+        }
+        .section-padding {
+            padding-top: 6rem; /* 96px */
+            padding-bottom: 6rem; /* 96px */
+        }
+        .btn-primary {
+            @apply bg-primary text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105;
+        }
+        .btn-secondary {
+            @apply bg-secondary text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-orange-600 transition duration-300 ease-in-out transform hover:scale-105;
+        }
+
+        /* Lottie Preloader Styling */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Allows clicks through once hidden */
+        }
+
+        /* Active Navbar Link Styling */
+        .nav-link.active {
+            color: #2563eb !important; /* Primary color */
+            font-weight: 600;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        /* Custom styling for Google Translate widget */
+        #google_translate_element .goog-te-gadget-simple {
+            border: none !important;
+            background-color: transparent !important;
+        }
+        #google_translate_element .goog-te-gadget-simple a.goog-te-menu-value {
+            color: #fff !important; /* White text for contrast on dark navbar */
+            font-size: 0.875rem; /* text-sm */
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+        }
+        #google_translate_element .goog-te-gadget-simple .goog-te-menu-value span {
+            color: #fff !important;
+        }
+        #google_translate_element .goog-te-gadget-simple .goog-te-menu-value:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        /* Hide the Google Translate branding */
+        .goog-logo-link {
+            display: none !important;
+        }
+        .goog-te-gadget {
+            color: transparent !important;
+        }
+        .VIpgJd-ZVi9od-ORHb-OEVmCD {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="preloader" class="flex items-center justify-center">
+        <lottie-player src="asset/loader.json" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>
+    </div>
+
+    <nav x-data="{ open: false }" class="fixed w-full z-50 bg-dark shadow-lg py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center flex-wrap">
+            <a href="index.html" class="flex items-center space-x-3 rtl:space-x-reverse">
+                <img src="https://placehold.co/60x60/000000/FFFFFF?text=NM" onerror="this.onerror=null;this.src='asset/logo.png';" alt="Nehemia Ministry Logo" class="h-14 rounded-full">
+                <span class="self-center text-2xl font-semibold whitespace-nowrap text-white font-serif">Nehemia Ministry</span>
+            </a>
+
+            <button @click="open = !open" class="navbar-toggler lg:hidden text-white focus:outline-none" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+
+            <div :class="{'block': open, 'hidden': !open}" class="w-full lg:block lg:w-auto mt-4 lg:mt-0" id="navbarSupportedContent">
+                <ul class="flex flex-col lg:flex-row lg:space-x-8 rtl:space-x-reverse text-lg font-medium lg:items-center">
+                    <li><a href="index.html" class="nav-link block py-2 px-3 text-white hover:text-primary rounded lg:bg-transparent lg:p-0 active" aria-current="page">Home</a></li>
+                    <li><a href="about.html" class="nav-link block py-2 px-3 text-white hover:text-primary rounded lg:bg-transparent lg:p-0">About Us</a></li>
+                    <li><a href="sermons.html" class="nav-link block py-2 px-3 text-white hover:text-primary rounded lg:bg-transparent lg:p-0">Sermons</a></li>
+                    <li><a href="events.html" class="nav-link block py-2 px-3 text-white hover:text-primary rounded lg:bg-transparent lg:p-0">Events</a></li>
+                    <li><a href="ministries.html" class="nav-link block py-2 px-3 text-white hover:text-primary rounded lg:bg-transparent lg:p-0">Ministries</a></li>
+                    <li><a href="gallery.html" class="nav-link block py-2 px-3 text-white hover:text-primary rounded lg:bg-transparent lg:p-0">Gallery</a></li>
+                    <li><a href="prayer-wall.html" class="nav-link block py-2 px-3 text-white hover:text-primary rounded lg:bg-transparent lg:p-0">Prayer Wall</a></li>
+                    <li><a href="give.html" class="nav-link block py-2 px-3 text-white hover:text-primary rounded lg:bg-transparent lg:p-0">Give</a></li>
+                    <li><a href="blog.html" class="nav-link block py-2 px-3 text-white hover:text-primary rounded lg:bg-transparent lg:p-0">Blog</a></li>
+                    <li><a href="contact.html" class="nav-link block py-2 px-3 text-white hover:text-primary rounded lg:bg-transparent lg:p-0">Contact</a></li>
+                    <li class="mt-4 lg:mt-0 lg:ml-4">
+                        <div id="google_translate_element" class="text-sm"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="relative h-screen flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('https://placehold.co/1920x1080/1f2937/FFFFFF?text=Nehemia+Ministry+Kenya'); background-attachment: fixed;">
+            <div class="absolute inset-0 bg-black opacity-60"></div>
+            <div class="relative z-10 text-white p-8 max-w-4xl mx-auto rounded-lg shadow-xl bg-opacity-20 bg-dark">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight font-serif text-white">
+                    Welcome to Nehemia Ministry Kenya
+                </h1>
+                <p id="typewriter-text" class="text-lg sm:text-xl lg:text-2xl mb-8 font-light text-white"></p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="about.html" class="btn-primary">Discover Our Story</a>
+                    <button id="generateDevotionBtn" class="btn-secondary">Generate Daily Devotion ✨</button>
+                </div>
+                <div id="devotionOutput" class="mt-8 p-4 bg-white bg-opacity-10 rounded-lg text-lg text-left hidden">
+                    <p id="devotionText" class="font-light text-white"></p>
+                    <p id="devotionLoading" class="text-center text-sm mt-2 hidden text-white">Loading devotion...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-padding bg-neutral animate-on-scroll">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col lg:flex-row items-center lg:space-x-12">
+                    <div class="lg:w-1/2 mb-8 lg:mb-0">
+                        <img src="https://placehold.co/600x400/f97316/FFFFFF?text=Founders" onerror="this.onerror=null;this.src='asset/founders.jpg';" alt="Bishop David Walukhu and Reverend Selina Walukhu" class="rounded-lg shadow-xl w-full h-auto object-cover">
+                    </div>
+                    <div class="lg:w-1/2 text-center lg:text-left">
+                        <h2 class="text-3xl sm:text-4xl font-bold mb-4 font-serif">About Nehemia Ministry Kenya: A Journey of Faith and Impact</h2>
+                        <p class="text-gray-700 leading-relaxed mb-4">
+                            Established in 2006 by the profound spiritual guidance of Bishop David Walukhu and the compassionate leadership of Reverend Selina Walukhu, Nehemia Ministry Kenya embarked on its divine journey from the humble grounds of Mukhonje, Kakamega County. What began as a nascent vision, nurtured by unwavering faith and fervent prayers, has blossomed into a vibrant beacon of hope and transformation across communities. Our founders, driven by a deep conviction in the holistic power of God's word, envisioned a ministry that not only addresses the spiritual hunger of individuals but also actively engages in uplifting the physical and social well-being of society.
+                        </p>
+                        <p class="text-gray-700 leading-relaxed mb-4">
+                            From its inception, Nehemia Ministry has been steadfast in its commitment to embodying the love of Christ through tangible acts of service. We believe that true ministry extends beyond the confines of the church building, reaching into the heart of human suffering and need. This philosophy has guided our expansion, leading to the establishment of various outreach programs and institutions designed to foster sustainable change and empower individuals. Our journey is a living testimony to God's faithfulness, demonstrating how a small seed of faith can grow into a mighty tree providing shelter, nourishment, and healing to countless lives.
+                        </p>
+                        <p class="text-gray-700 leading-relaxed mb-6">
+                            We are more than just a church; we are a family united by a shared purpose: to build strong individuals, resilient families, and thriving communities, all rooted in the timeless principles of Christian values. Every step of our expansion, every life touched, and every prayer answered is a testament to the grace of God and the dedication of our beloved founders and the entire Nehemia Ministry family. Join us as we continue to write this incredible story of faith, hope, and love.
+                        </p>
+                        <a href="about.html" class="btn-primary">Learn More About Our History and Vision</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-padding bg-white animate-on-scroll">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-12 font-serif">Our Core Beliefs: The Foundation of Our Faith</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                    <div class="bg-neutral p-6 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold mb-3 font-serif text-primary"><i class="fas fa-bible mr-2"></i> The Holy Scriptures</h3>
+                        <p class="text-gray-700">We believe the Bible, consisting of the Old and New Testaments, is the inspired, infallible, and authoritative Word of God. It is the supreme and final authority in all matters of faith and conduct, guiding our lives and doctrines.</p>
+                    </div>
+                    <div class="bg-neutral p-6 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold mb-3 font-serif text-primary"><i class="fas fa-cross mr-2"></i> The One True God</h3>
+                        <p class="text-gray-700">We believe in one God, eternally existent in three persons: Father, Son (Jesus Christ), and Holy Spirit. He is the Creator of all things, infinitely perfect, and worthy of all worship and praise.</p>
+                    </div>
+                    <div class="bg-neutral p-6 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold mb-3 font-serif text-primary"><i class="fas fa-church mr-2"></i> Salvation Through Christ</h3>
+                        <p class="text-gray-700">We believe that salvation is a gift from God, received through grace by faith in Jesus Christ alone. His atoning sacrifice on the cross provides forgiveness of sins and eternal life for all who believe.</p>
+                    </div>
+                    <div class="bg-neutral p-6 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold mb-3 font-serif text-primary"><i class="fas fa-dove mr-2"></i> The Holy Spirit</h3>
+                        <p class="text-gray-700">We believe in the present ministry of the Holy Spirit, by whose indwelling the Christian is enabled to live a godly life, and by whose power the church is empowered to carry out Christ's mission.</p>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <a href="about.html" class="btn-primary">Discover More About Our Doctrine</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-padding bg-neutral animate-on-scroll">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-12 font-serif">Our Impactful Ministries</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div class="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center transform transition duration-300 hover:scale-105 hover:shadow-xl">
+                        <img src="https://placehold.co/300x200/2563eb/FFFFFF?text=Hospital" onerror="this.onerror=null;this.src='asset/hospital.jpg';" alt="Kingdom Faith-Based Hospital" class="w-full h-48 object-cover rounded-md mb-4">
+                        <h3 class="text-2xl font-semibold mb-3 font-serif">Kingdom Faith-Based Hospital</h3>
+                        <p class="text-gray-700 text-center mb-4 flex-grow">
+                            Providing compassionate healthcare services rooted in faith, serving the physical and spiritual well-being of our community. We offer essential medical care with love and dignity.
+                        </p>
+                        <a href="ministries.html#hospital" class="btn-secondary text-sm">Explore Hospital</a>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center transform transition duration-300 hover:scale-105 hover:shadow-xl">
+                        <img src="https://placehold.co/300x200/f97316/FFFFFF?text=Matco" onerror="this.onerror=null;this.src='asset/matco.jpg';" alt="Matco Training Institute" class="w-full h-48 object-cover rounded-md mb-4">
+                        <h3 class="text-2xl font-semibold mb-3 font-serif">Matco Training Institute</h3>
+                        <p class="text-gray-700 text-center mb-4 flex-grow">
+                            Empowering youth with vocational skills and knowledge at our Malaha campus, preparing them for a brighter future and self-sufficiency.
+                        </p>
+                        <a href="ministries.html#matco" class="btn-secondary text-sm">Discover Matco</a>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center transform transition duration-300 hover:scale-105 hover:shadow-xl">
+                        <img src="https://placehold.co/300x200/2563eb/FFFFFF?text=Orphanage" onerror="this.onerror=null;this.src='asset/orphanage.jpg';" alt="New Promise Orphanage" class="w-full h-48 object-cover rounded-md mb-4">
+                        <h3 class="text-2xl font-semibold mb-3 font-serif">New Promise Orphanage</h3>
+                        <p class="text-gray-700 text-center mb-4 flex-grow">
+                            Offering a loving home and nurturing environment for orphaned and vulnerable children in Lwandeti, ensuring their safety, education, and spiritual growth.
+                        </p>
+                        <a href="ministries.html#orphanage" class="btn-secondary text-sm">Support Orphanage</a>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <a href="ministries.html" class="btn-primary">View All Ministries</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-padding bg-white animate-on-scroll">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-12 font-serif">Hear From Our Community</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-neutral p-6 rounded-lg shadow-lg flex flex-col justify-between">
+                        <p class="text-gray-700 italic mb-4">"Nehemia Ministry transformed my life. The teachings are profound, and the community is incredibly supportive. I've found true purpose here."</p>
+                        <p class="font-semibold text-right">- Jane W., Nairobi</p>
+                    </div>
+                    <div class="bg-neutral p-6 rounded-lg shadow-lg flex flex-col justify-between">
+                        <p class="text-gray-700 italic mb-4">"The compassion shown at the Kingdom Faith-Based Hospital is unmatched. They cared for my family with both medical expertise and genuine love."</p>
+                        <p class="font-semibold text-right">- David K., Kakamega</p>
+                    </div>
+                    <div class="bg-neutral p-6 rounded-lg shadow-lg flex flex-col justify-between">
+                        <p class="text-gray-700 italic mb-4">"My children at New Promise Orphanage are thriving. They receive excellent care, education, and most importantly, a loving family environment."</p>
+                        <p class="font-semibold text-right">- Sarah M., Lwandeti</p>
+                    </div>
+                    <div class="bg-neutral p-6 rounded-lg shadow-lg flex flex-col justify-between">
+                        <p class="text-gray-700 italic mb-4">"The Matco Training Institute gave me the skills I needed to start my own business. Nehemia Ministry truly empowers its youth."</p>
+                        <p class="font-semibold text-right">- Peter O., Malaha</p>
+                    </div>
+                    <div class="bg-neutral p-6 rounded-lg shadow-lg flex flex-col justify-between">
+                        <p class="text-gray-700 italic mb-4">"Every event at Nehemia Ministry is a blessing. The fellowship is rich, and the messages are always timely and impactful."</p>
+                        <p class="font-semibold text-right">- Grace N., Eldoret</p>
+                    </div>
+                    <div class="bg-neutral p-6 rounded-lg shadow-lg flex flex-col justify-between">
+                        <p class="text-gray-700 italic mb-4">"The prayer wall has been a source of immense comfort. Knowing that a community is praying for you makes all the difference."</p>
+                        <p class="font-semibold text-right">- Michael A., Kisumu</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-padding bg-neutral animate-on-scroll">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-12 font-serif">Upcoming Events</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl">
+                        <h3 class="text-2xl font-semibold mb-2 font-serif">Annual Revival Meeting</h3>
+                        <p class="text-primary text-lg mb-3"><i class="fas fa-calendar-alt mr-2"></i> July 15-20, 2025</p>
+                        <p class="text-gray-700 mb-4">Join us for a powerful week of worship, prayer, and profound teachings. Special guest speakers will be announced soon.</p>
+                        <a href="events.html" class="text-primary hover:underline font-semibold">Details <i class="fas fa-arrow-right ml-1"></i></a>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl">
+                        <h3 class="text-2xl font-semibold mb-2 font-serif">Youth Empowerment Summit</h3>
+                        <p class="text-primary text-lg mb-3"><i class="fas fa-calendar-alt mr-2"></i> August 10, 2025</p>
+                        <p class="text-gray-700 mb-4">A day dedicated to inspiring and equipping the next generation with leadership skills and spiritual guidance.</p>
+                        <a href="events.html" class="text-primary hover:underline font-semibold">Details <i class="fas fa-arrow-right ml-1"></i></a>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-xl">
+                        <h3 class="text-2xl font-semibold mb-2 font-serif">Community Outreach Day</h3>
+                        <p class="text-primary text-lg mb-3"><i class="fas fa-calendar-alt mr-2"></i> September 5, 2025</p>
+                        <p class="text-gray-700 mb-4">Volunteer with us as we serve our local community through various acts of kindness and support.</p>
+                        <a href="events.html" class="text-primary hover:underline font-semibold">Details <i class="fas fa-arrow-right ml-1"></i></a>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <a href="events.html" class="btn-primary">View All Events</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-padding bg-white animate-on-scroll">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-12 font-serif">Featured Sermon</h2>
+                <div class="max-w-3xl mx-auto bg-neutral rounded-lg shadow-xl p-4">
+                    <div class="relative w-full" style="padding-top: 56.25%;"> <iframe class="absolute top-0 left-0 w-full h-full rounded-lg" src="https://www.youtube.com/embed/VIDEO_ID_PLACEHOLDER" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Featured Sermon Video"></iframe>
+                    </div>
+                    <h3 class="text-2xl font-semibold mt-6 mb-4 font-serif">"The Power of Faith in Adversity" - Bishop David Walukhu</h3>
+                    <p class="text-gray-700 mb-6">
+                        In this inspiring message, Bishop David Walukhu shares profound insights on how to navigate life's challenges with unwavering faith, drawing lessons from biblical narratives and personal testimonies.
+                    </p>
+                    <a href="sermons.html" class="btn-primary">Watch More Sermons</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-padding bg-primary text-white text-center animate-on-scroll">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-6 font-serif">Join Our Mission of Hope and Transformation</h2>
+                <p class="text-lg mb-8 max-w-2xl mx-auto">
+                    Whether you're seeking spiritual growth, looking to serve your community, or simply curious about our work, Nehemia Ministry Kenya welcomes you with open arms. Discover how you can be a part of something truly impactful.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="give.html" class="bg-white text-primary font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition duration-300 ease-in-out transform hover:scale-105">Support Our Work</a>
+                    <a href="contact.html" class="border-2 border-white text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-white hover:text-primary transition duration-300 ease-in-out transform hover:scale-105">Get In Touch</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-padding bg-neutral animate-on-scroll">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-12 font-serif">Find Us</h2>
+                <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-xl p-4">
+                    <div class="relative w-full" style="padding-top: 75%;"> <iframe class="absolute top-0 left-0 w-full h-full rounded-lg" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.479589408665!2d34.61217037498758!3d0.4851225995133604!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1781d4a0c8b0c8b1%3A0x123456789abcdef0!2sMukhonje%2C%20Kakamega%20County%2C%20Kenya!5e0!3m2!1sen!2ske!4v1678901234567!5m2!1sen!2ske" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Nehemia Ministry Location Map"></iframe>
+                    </div>
+                    <h3 class="text-2xl font-semibold mt-6 mb-4 font-serif">Main Church Location</h3>
+                    <p class="text-gray-700 text-lg mb-2"><i class="fas fa-map-marker-alt mr-2 text-primary"></i> Mukhonje, Kakamega County, Kenya</p>
+                    <p class="text-gray-700 text-lg mb-2"><i class="fas fa-phone mr-2 text-primary"></i> +254 7XX XXX XXX</p>
+                    <p class="text-gray-700 text-lg"><i class="fas fa-envelope mr-2 text-primary"></i> info@nehemiaministry.org</p>
+                    <div class="mt-8">
+                        <a href="contact.html" class="btn-primary">Get Directions & Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+            <div>
+                <h3 class="text-2xl font-semibold mb-4 font-serif">Contact Us</h3>
+                <p class="mb-2"><i class="fas fa-map-marker-alt mr-2 text-primary"></i> Mukhonje, Kakamega County, Kenya</p>
+                <p class="mb-2"><i class="fas fa-phone mr-2 text-primary"></i> +254 7XX XXX XXX</p>
+                <p class="mb-2"><i class="fas fa-envelope mr-2 text-primary"></i> info@nehemiaministry.org</p>
+                <p><i class="fab fa-whatsapp mr-2 text-primary"></i> <a href="https://wa.me/2547XXXXXXXX" class="hover:underline">WhatsApp Us</a></p>
+            </div>
+
+            <div>
+                <h3 class="text-2xl font-semibold mb-4 font-serif">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="about.html" class="hover:text-primary transition duration-200">About Us</a></li>
+                    <li><a href="sermons.html" class="hover:text-primary transition duration-200">Sermons</a></li>
+                    <li><a href="events.html" class="hover:text-primary transition duration-200">Events</a></li>
+                    <li><a href="ministries.html" class="hover:text-primary transition duration-200">Ministries</a></li>
+                    <li><a href="blog.html" class="hover:text-primary transition duration-200">Blog</a></li>
+                    <li><a href="contact.html" class="hover:text-primary transition duration-200">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="md:text-right">
+                <h3 class="text-2xl font-semibold mb-4 font-serif">Stay Connected</h3>
+                <p class="mb-4">Subscribe to our newsletter for updates:</p>
+                <form class="flex flex-col md:items-end">
+                    <input type="email" placeholder="Your Email" class="p-3 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary mb-3 w-full md:w-auto">
+                    <button type="submit" class="btn-secondary w-full md:w-auto">Subscribe</button>
+                </form>
+                <div class="flex justify-center md:justify-end space-x-4 mt-6">
+                    <a href="#" class="text-white hover:text-primary text-2xl transition duration-200"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-white hover:text-primary text-2xl transition duration-200"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white hover:text-primary text-2xl transition duration-200"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white hover:text-primary text-2xl transition duration-200"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 text-center mt-8 pt-8 border-t border-gray-700">
+            <p class="text-sm">© 2025 Nehemia Ministry Kenya. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        // Ensure GSAP is registered if not already
+        if (typeof gsap !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lottie Preloader Logic
+            const preloader = document.getElementById('preloader');
+            window.addEventListener('load', () => {
+                gsap.to(preloader, {
+                    opacity: 0,
+                    visibility: 'hidden',
+                    duration: 0.8,
+                    ease: "power2.out",
+                    onComplete: () => {
+                        preloader.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Typewriter Effect for Hero Section
+            const typewriterTextElement = document.getElementById('typewriter-text');
+            const phrases = [
+                "\"I will restore to you the years that the swarming locust has eaten.\" - Joel 2:25",
+                "Spreading God's love and hope across Kenya.",
+                "Transforming lives through faith and service.",
+                "Building a brighter future, one soul at a time."
+            ];
+            let phraseIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+
+            function typeWriter() {
+                const currentPhrase = phrases[phraseIndex];
+                let displayedText = currentPhrase.substring(0, charIndex);
+                typewriterTextElement.textContent = displayedText;
+
+                if (!isDeleting && charIndex < currentPhrase.length) {
+                    charIndex++;
+                    setTimeout(typeWriter, 70); // Typing speed
+                } else if (isDeleting && charIndex > 0) {
+                    charIndex--;
+                    setTimeout(typeWriter, 40); // Deleting speed
+                } else if (!isDeleting && charIndex === currentPhrase.length) {
+                    setTimeout(() => isDeleting = true, 2000); // Pause at end of phrase
+                    setTimeout(typeWriter, 40);
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    phraseIndex = (phraseIndex + 1) % phrases.length;
+                    setTimeout(typeWriter, 500); // Pause before typing next phrase
+                }
+            }
+            typeWriter(); // Start the typewriter effect
+
+            // GSAP Scroll-based Animations
+            gsap.utils.toArray('.animate-on-scroll').forEach(section => {
+                gsap.from(section, {
+                    opacity: 0,
+                    y: 50,
+                    duration: 1,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 80%", // When the top of the section hits 80% of the viewport
+                        end: "bottom 20%",
+                        toggleActions: "play none none none", // Play animation once
+                        // markers: true, // For debugging purposes
+                    }
+                });
+            });
+
+            // GSAP Hover Animations for Buttons
+            document.querySelectorAll('.btn-primary, .btn-secondary').forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    gsap.to(button, { scale: 1.05, duration: 0.2, ease: "power1.out" });
+                });
+                button.addEventListener('mouseleave', () => {
+                    gsap.to(button, { scale: 1, duration: 0.2, ease: "power1.out" });
+                });
+            });
+
+            // Active Navbar Link Highlighting
+            const currentPath = window.location.pathname.split('/').pop();
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active'); // Remove active from all
+                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.html')) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Gemini API Integration: Daily Devotion Generator
+            const generateDevotionBtn = document.getElementById('generateDevotionBtn');
+            const devotionOutput = document.getElementById('devotionOutput');
+            const devotionText = document.getElementById('devotionText');
+            const devotionLoading = document.getElementById('devotionLoading');
+
+            generateDevotionBtn.addEventListener('click', generateDevotion);
+
+            async function generateDevotion() {
+                devotionOutput.classList.remove('hidden'); // Show the output area
+                devotionText.textContent = ''; // Clear previous text
+                devotionLoading.classList.remove('hidden'); // Show loading indicator
+
+                const prompt = "Provide a short, uplifting Christian devotional message or a relevant scripture verse with a brief reflection (max 100 words). Focus on themes of hope, faith, or encouragement.";
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Canvas will automatically provide the API key at runtime
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API error: ${response.status} ${response.statusText} - ${errorData.error.message}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        devotionText.textContent = text;
+                    } else {
+                        devotionText.textContent = "Could not generate a devotion. Please try again.";
+                        console.error("Unexpected API response structure:", result);
+                    }
+                } catch (error) {
+                    devotionText.textContent = "Failed to generate devotion. Please check your network connection or try again later.";
+                    console.error("Error generating devotion:", error);
+                } finally {
+                    devotionLoading.classList.add('hidden'); // Hide loading indicator
+                }
+            }
+        });
+    </script>
+</body>
+</html>
