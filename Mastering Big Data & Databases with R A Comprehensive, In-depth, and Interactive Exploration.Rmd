@@ -1,919 +1,659 @@
 ---
-title: "Mastering Big Data & Databases with R: A Comprehensive, In-depth, and Interactive Exploration"
-author: "Daniel Wanjala Machimbo, MSc. Candidate"
-date: "May 20, 2025 (Presentation Date)"
+title: "Illuminating Data: Mastering Databases and Big Data with R"
+subtitle: "A Comprehensive Guide with Kenyan Perspectives"
+author: "Daniel Wanjala Machimbo"
+date: "Presentation Date: May 20, 2025 (Content Prepared: `r Sys.Date()`)"
 output:
-  ioslides_presentation:
-    logo: "logo.png"
-    widescreen: true
-    smaller: false
-    transition: "default"
-    css: "styles.css"
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    theme: cosmo # A clean, modern theme
+    highlight: pygments # Syntax highlighting style
+    df_print: kable # Nicely formatted data frames
+    code_folding: hide # Users can expand code
 ---
-
-
 
 ```{r setup, include=FALSE}
-# This chunk runs setup code that is not shown in the presentation.
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = 'center',
-                      fig.width = 7.5, fig.height = 4.5) # Adjusted for potentially more text
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align = 'center', fig.width=9, fig.height=5.5)
 
-# Install and load necessary packages - Ensure these are installed!
-# install.packages(c("DBI", "RSQLite", "dplyr", "dbplyr", "ggplot2", "data.table", "DT", 
-#                    "skimr", "plotly", "patchwork", "scales", "viridisLite", 
-#                    "crosstalk", "nycflights13"))
-
+# Core Packages
 library(DBI)
-library(RSQLite)
+library(RSQLite) # For SQLite examples
 library(dplyr)
-library(dbplyr)
+library(dbplyr)   # For using dplyr with databases
+
+# Data Handling & Big Data Packages
+library(data.table) # For fread/fwrite and efficient data manipulation
+library(readr)      # For read_csv_chunked
+library(arrow)      # For Parquet and larger-than-memory datasets
+
+# Visualization
 library(ggplot2)
-library(data.table)
-library(DT)
-library(skimr)      
-library(plotly)     
-library(patchwork)  
-library(scales)     
-library(viridisLite) 
-library(crosstalk) 
+library(viridis) # For nice color scales
 
-set.seed(123)
+# Example Datasets
+# install.packages(c("nycflights13")) # Ensure this is installed
+library(nycflights13) # For database examples with flights data
 
-# Optional: Custom CSS (styles.css) - Consider enhancing font sizes or line spacing for wordiness
-# /* styles.css */
-# body { font-family: 'Georgia', serif; color: #2C3E50; line-height: 1.6; }
-# .slides > slide { background-color: #ECF0F1; border-top: 6px solid #2980B9; }
-# h1, h2, h3 { color: #2C3E50; font-weight: bold; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;} 
-# code { font-size: 0.88em; background-color: #E8F0FE; border-radius: 4px; padding: 2px 4px; color: #34495E;}
-# .remark-slide-content { font-size: 20px; } 
-# slides > slide:not(.nobackground):after { content: ""; }
-# .forceBreak { page-break-after: always; } 
-# .two-column { display: flex; justify-content: space-between; align-items: flex-start;}
-# .two-column > div { width: 48%; }
-# .scrollable-output { max-height: 250px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; font-size: 0.8em;}
-
+# Set a seed for reproducibility in simulations
+set.seed(2024)
 ```
 
-## The Modern Data Paradigm: Understanding Big Data and its Database Imperatives
+# Prelude: A Word on Data in Our Exploration (Approx. 2 minutes)
 
-### Deconstructing "Big Data": More Than Just Size – The "V's" Magnified
-<div class="two-column">
-<div>
-The term "Big Data" encapsulates data ecosystems characterized by several key attributes, often called the "V's":
-<ul>
-  <li><strong>Volume (The Sheer Scale):</strong> This refers to the enormous quantities of data generated and collected. We've moved from gigabytes and terabytes to petabytes, exabytes, and even zettabytes.
-    <ul><li><em>Real-World Example:</em> Consider a multinational retail giant like Carrefour or Walmart. They process millions of customer transactions daily across thousands of stores worldwide, each transaction containing multiple items, timestamps, payment details, and customer information. This data, accumulated over years, forms a colossal dataset used for inventory management, sales forecasting, and customer behavior analysis. Similarly, Safaricom's M-Pesa platform in Kenya processes an immense volume of mobile money transactions daily, creating a vast repository of financial data.</li></ul>
-  </li>
-  <li><strong>Velocity (The Speed of Influx & Processing):</strong> This dimension addresses the rate at which data is generated, streamed, and needs to be processed, often in real-time or near real-time.
-    <ul><li><em>Real-World Example:</em> Social media platforms like Twitter or Facebook experience an incredible velocity of data. During a major global event, like the Olympics or an election, millions of tweets, posts, and comments are generated per minute. Financial stock exchanges also operate at high velocity, with trading data (buy/sell orders, price changes) updated in microseconds. IoT sensors in a smart city (e.g., traffic sensors in Nairobi) continuously stream data requiring rapid analysis for traffic management.</li></ul>
-  </li>
-</ul>
-</div>
-<div>
-<ul>
-  <li><strong>Variety (The Multifaceted Nature):</strong> Data now comes in a multitude of formats, far beyond traditional structured databases.
-    <ul><li><em>Structured:</em> Data with a predefined format, like tables in a relational database (e.g., customer records, sales figures).</li>
-    <li><em>Semi-structured:</em> Data that doesn't fit into rigid tables but has some organizational properties, like JSON or XML files (e.g., web server logs, API responses).</li>
-    <li><em>Unstructured:</em> Data without a predefined format, such as text documents, emails, images, audio, and video files.
-    <em>Real-World Example:</em> In healthcare, patient data is a prime example of variety. It includes structured Electronic Medical Records (EMRs), semi-structured HL7 messages, unstructured doctor's notes, medical images (X-rays, MRIs), and even genomic data. Analyzing this variety provides a holistic patient view.</li></ul>
-  </li>
-  <li><strong>Veracity (The Quest for Truth):</strong> This refers to the quality, accuracy, and trustworthiness of data. Big Data can be messy, inconsistent, and contain biases or errors.
-    <ul><li><em>Real-World Example:</em> User-generated content on review sites or social media can suffer from biases, fake reviews, or misinformation. Sensor data from IoT devices might drift over time or be affected by environmental factors, impacting its accuracy. Ensuring data veracity is critical for making reliable decisions. Data cleaning and validation are paramount.</li></ul>
-  </li>
-  <li><strong>Value (The Ultimate Prize):</strong> This is arguably the most important "V." It's about the ability to transform the vast, fast, and varied data into tangible business insights, operational efficiencies, and competitive advantages.
-    <ul><li><em>Real-World Example:</em> Netflix analyzes viewing patterns (volume, velocity, variety) of millions of subscribers to power its recommendation engine (value), significantly improving customer retention. Similarly, banks use transactional data to detect fraudulent patterns (value), saving millions.</li></ul>
-  </li>
-</ul>
-</div>
-</div>
+Karibu! Today, we explore the powerful capabilities of R in managing and analyzing data, particularly when dealing with structured databases and large-scale datasets ("big data").
 
----
+A quick note on the datasets we'll use:
 
-## The Strategic Imperative: Why Every Data Scientist Must Master Big Data & Database Interaction
+1.  **Simulated Kenyan Scenarios:** To make concepts directly relatable, we will create small, illustrative datasets within our R code. These will mimic real-world Kenyan contexts (e.g., county statistics, transactional data).These are *not* official KNBS datasets but are crafted for clear demonstration.
 
-In today's data-driven world, the ability to effectively manage, query, and analyze large-scale datasets housed in various database systems is no longer a niche skill—it's a fundamental competency for any aspiring or practicing data scientist. The insights derived from such data are the bedrock of modern innovation and strategy.
+2.  **Standard R Packages:** We'll also use datasets from established R packages like `nycflights13`. While US-centric, the principles of handling this data (e.g., millions of flight records) are directly transferable to analyzing, say, transportation logs from the Kenya National Highways Authority (KeNHA) or logistics data for a large distributor.
 
-* **Unlocking Deeper, More Granular Insights for Informed Decisions:** Large datasets allow us to move beyond simple averages and explore nuanced patterns, segmentations, and correlations that are invisible in smaller samples. This leads to more accurate predictive models and better-informed strategic decisions across all sectors.
-    * <em>Real-World Example (Finance):</em> Investment banks analyze petabytes of historical market data, news feeds (text), and economic indicators to build sophisticated algorithmic trading models, identifying fleeting arbitrage opportunities. In Kenya, micro-finance institutions could analyze vast amounts of mobile lending data to refine credit scoring models for the unbanked, promoting financial inclusion while managing risk.
-* **Gaining and Maintaining Competitive Advantage:** Organizations that can effectively leverage their data assets can understand customer behavior better, optimize their operations, personalize services, and react more quickly to market changes.
-    * <em>Real-World Example (Retail):</em> E-commerce giants like Amazon or Jumia use massive datasets on customer Browse history, purchases, and reviews to offer personalized recommendations, optimize supply chains, and dynamically adjust pricing, thereby outmaneuvering less data-savvy competitors.
-* **Driving Innovation and Discovering New Opportunities:** Big Data often reveals unmet customer needs, emerging trends, or inefficiencies that can spark the development of entirely new products, services, or business models.
-    * <em>Real-World Example (Healthcare):</em> Pharmaceutical companies analyze large-scale genomic data and clinical trial results to accelerate drug discovery and develop personalized medicine tailored to an individual's genetic makeup.
-* **Achieving Operational Excellence and Efficiency:** Analyzing operational data can help identify bottlenecks, reduce waste, improve quality control, and automate processes.
-    * <em>Real-World Example (Logistics):</em> Courier companies like DHL or local players like Sendy in Kenya use GPS data from their fleet, traffic information, and delivery records to optimize routes, reduce fuel consumption, and improve delivery times.
+3.  **Focus on Principles:** The primary goal is to understand *how* R tools work, so you can apply them to *any* dataset you encounter, including authentic Kenyan data from sources like the Kenya National Bureau of Statistics (KNBS) open data portal or specific organisational databases.
 
-**The Challenges Are Significant, But So Are the Rewards:**
-Successfully navigating the Big Data landscape involves overcoming hurdles like scalable storage, robust processing power, ensuring data quality and governance, and developing the necessary talent. However, the organizations and individuals who master these challenges are poised to lead in their respective fields. This presentation will equip you with how R can be a pivotal tool in this journey.
+Let's begin!
 
----
+------------------------------------------------------------------------
 
-## R's Strategic Position in the Big Data Ecosystem: The Analytical Powerhouse Meets Data Stores
+# Part 1: The Art and Science of Databases in R (Approx. 25 minutes)
 
-While R is renowned for its in-memory analytics, its true power in the Big Data realm lies in its exceptional ability to connect to, interact with, and analyze data from a multitude of external data storage systems. R serves as a versatile and powerful analytical hub, bridging the gap between raw data and actionable insights. Your HP ZBook 15 G5, with its i7/i9 processor, 16GB RAM, and NVIDIA Quadro P2000, is a robust development machine well-suited for leveraging these R capabilities, especially when working with database interfaces and processing substantial data subsets.
+## 1.1 What is a Database? A Clinical Definition
 
-<div class="two-column">
-<div>
-<img src="https://placehold.co/300x300/D6EAF8/003D6B?text=R&font=impact" alt="R Logo" style="border-radius: 50%; width:150px; height:150px; margin: 10px auto; display:block;">
-R's key strengths include:
-<ul>
-  <li>🔗 **Universal Database Connectivity via `DBI`:** The `DBI` (DataBase Interface) package provides a standardized, consistent API. This means that the way you write R code to connect to and query different SQL databases (like PostgreSQL, MySQL, SQL Server, SQLite) is remarkably similar. You simply switch out the specific database driver (e.g., `RPostgreSQL`, `RMySQL`, `odbc`). This abstraction layer significantly simplifies cross-database development.</li>
-  <li>🧠 **Intelligent Database-Side Computation with `dbplyr`:** This transformative package allows you to write familiar `dplyr` data manipulation verbs (like `filter`, `mutate`, `group_by`, `summarise`) in R. `dbplyr` then cleverly translates this R code into efficient SQL queries that are executed *directly on the database server*. This is crucial because it means you're not pulling massive datasets into R's memory; instead, you're leveraging the database's own processing power. Only the (typically much smaller) final result set is brought into R. This employs "lazy evaluation," where computation is deferred until absolutely necessary.</li>
-</ul>
-</div>
-<div>
-<ul>
-  <li>🚀 **Blazing-Fast In-Memory Operations with `data.table`:** For datasets or data chunks that *do* fit into R's memory, the `data.table` package offers unparalleled performance. Its concise syntax and highly optimized C-backend allow for incredibly fast data subsetting, grouping, joining, and updates, often orders of magnitude faster than base R data frames, especially for large in-memory objects.</li>
-  <li>🌐 **Seamless Integration with Dedicated Big Data Frameworks:**
-    <ul><li>**`sparklyr`:** Provides an R interface to Apache Spark, a leading distributed computing framework. This allows R users to leverage Spark's power for processing truly massive datasets (terabytes or petabytes) distributed across a cluster, all while using `dplyr` syntax or running R code on Spark workers.</li>
-    <li>**`bigrquery`:** A specific package for interacting with Google BigQuery, a highly scalable, serverless cloud data warehouse.</li></ul>
-  </li>
-  <li>📊 **Sophisticated Static and Interactive Visualization Capabilities:**
-    <ul><li>**`ggplot2`:** The gold standard for creating publication-quality static visualizations, allowing for complex, layered graphics based on the "grammar of graphics."</li>
-    <li>**`plotly`:** Enables the creation of fully interactive web-based visualizations from `ggplot2` objects (via `ggplotly()`) or by building `plotly` charts directly. These charts can include tooltips, zooming, panning, and can be embedded in web applications.</li>
-    <li>**`crosstalk`:** Facilitates linked brushing and filtering between different HTML widgets (like `plotly` charts and `DT` tables), enabling dynamic data exploration.</li></ul>
-  </li>
-  <li>🛠️ **Unrivaled Ecosystem of Analytical Libraries:** R boasts an extensive collection of packages for virtually any statistical analysis or machine learning task, from time series forecasting (`forecast`, `prophet`) to complex machine learning models (`tidymodels`, `mlr3`, `caret`, `h2o`), text mining (`tm`, `tidytext`), and specialized bioinformatics analyses.</li>
-</ul>
-</div>
-</div>
+A **database** is a systematically organized or structured collection of data, typically stored electronically in a computer system. It is designed for efficient storage, retrieval, management, and updating of information. Key characteristics include:
 
----
+-   **Persistence:** Data endures beyond the life of a single application session.
+-   **Structure:** Data is organized according to a predefined schema (e.g., tables with rows and columns, defined data types).
+-   **Controlled Access:** Mechanisms for data security, integrity, and concurrency control are implemented.
+-   **Data Independence:** The way data is stored (physical schema) can be changed without necessarily affecting how applications interact with it (logical schema).
+-   **Query Language:** Typically provides a specialized language (most commonly SQL - Structured Query Language) for data manipulation and retrieval.
 
-## Phase 1: Initial Data Reconnaissance – Using `skimr` for a Rapid Overview of `ggplot2::diamonds`
+Think of it as a highly organized, secure, and efficient digital filing cabinet, purpose-built for information management.
 
-Before we even consider loading data into a database or performing complex queries, it's crucial to conduct an initial exploration to understand its structure, content, and potential quirks. The `skimr` package in R provides an excellent way to get a quick, yet comprehensive, summary of a dataset. We'll use the built-in `ggplot2::diamonds` dataset, which contains information on nearly 54,000 diamonds, as our example.
+***Example:*** *Imagine the* **Social Health Authority** *(SHA) system. It's a massive database holding records for millions of Kenyans: personal details, contribution history, claims made, accredited hospitals. This isn't just a list; it's a structured system ensuring data accuracy (e.g., a member ID links to one person), security (protecting sensitive health info), and allowing multiple operations simultaneously (new registrations, claim processing, report generation).*
 
-```{r skim_diamonds, R.options=list(width=110), results='markup'}
-data(diamonds, package = "ggplot2")
+## 1.2 The `DBI` Package: R's Universal Translator for Databases
 
-# The skim() function provides type-specific summaries.
-# For numeric variables: missing counts, mean, sd, quantiles, histogram.
-# For factor/character variables: missing counts, unique counts, top counts.
-skim_output <- skimr::skim(diamonds)
-print(skim_output) # The output is rich and best viewed in an R console or full Rmd output.
-                  # For slides, we're showing the print output which will wrap.
-```
-<div class="scrollable-output">
-```{r skim_diamonds_print_capture, echo=FALSE, R.options=list(width=110), results='asis'}
-# This captures the print output for better display on the slide
-skim_output_text <- capture.output(print(skimr::skim(diamonds)))
-cat(paste(skim_output_text, collapse = "\n"))
-```
-</div>
+The `DBI` (Database Interface) package is the cornerstone of database interaction in R. It offers a **standardized API** (Application Programming Interface) – a common set of functions – to communicate with a wide variety of database systems.
 
-**Interpreting the `skimr` Output – What Are We Looking For?**
-* **Data Types & Completeness:** `skimr` immediately shows the data type of each column (`numeric`, `factor`, `ordered factor`) and the number/percentage of missing values (`n_missing`, `complete_rate`). Identifying missing data early is vital. *For example, if 'price' had many missing values, we'd need a strategy (imputation, removal) before analysis.*
-* **Numeric Variable Summaries:**
-    * `mean`, `sd`: Central tendency and dispersion.
-    * `p0`, `p25`, `p50`, `p75`, `p100`: Minimum, 1st quartile, median, 3rd quartile, maximum. These give a sense of the data's range and distribution. A huge difference between `p75` and `p100` might indicate outliers.
-    * `hist`: A small textual histogram provides a quick glance at the shape of the distribution (e.g., skewed, normal). *For 'carat', we might see a right skew, indicating most diamonds are smaller, with a few very large ones.*
-* **Factor/Character Variable Summaries:**
-    * `n_unique`: Number of distinct categories.
-    * `top_counts`: Shows the most frequent categories and their counts. This helps understand the balance of categorical variables. *For 'cut', we'd see which quality of cut is most common.*
-    * `ordered`: Indicates if a factor is ordered (like `diamonds$cut`).
+**The `DBI` Philosophy:** Learn it once, apply it to many.
 
-This initial scan helps formulate hypotheses, identify data cleaning needs, and plan subsequent database operations and analytical steps.
+1\. `dbConnect()`: Establish a connection using a specific database driver.
 
----
-## Phase 2: Establishing the Link – Connecting R to Databases with `DBI`
+2\. `dbWriteTable()`: Transfer an R data frame into a database table.
 
-The `DBI` (DataBase Interface) package is the cornerstone of database interaction in R. It provides a standardized, backend-agnostic API, meaning that R code written using `DBI` functions can, with minimal changes (primarily to the connection details and driver), communicate with a wide array of different database management systems (DBMS).
+3\. `dbListTables()`: See what tables exist in the database.
 
-### The `DBI` Standard: A Consistent Workflow for Diverse Databases
+4. `dbGetQuery()`: Send an SQL query and retrieve all results as an R data frame.
 
-The general workflow for using `DBI` involves these key steps:
+5\. `dbSendQuery()`, `dbFetch()`: For more granular control, especially with large results (send query, then fetch results in pieces).
 
-1.  **Load the Specific Database Driver:** R needs a "translator" to speak the language of the target database. This is provided by a specific driver package.
-    * Examples: `RSQLite::SQLite()` for SQLite, `RPostgres::Postgres()` for PostgreSQL, `RMySQL::MySQL()` for MySQL/MariaDB, `odbc::odbc()` for connecting via ODBC drivers (common for SQL Server, Oracle, etc.).
-2.  **Establish a Connection:** The `dbConnect(driver_object, ...)` function creates an active connection to the database.
-    * Connection parameters are specific to the database:
-        * For `RSQLite`: `dbConnect(RSQLite::SQLite(), dbname = "path/to/database.sqlite")` or `dbname = ":memory:"` for an in-memory database.
-        * For server-based databases (PostgreSQL, MySQL, SQL Server): `dbConnect(RPostgres::Postgres(), dbname = "mydb", host = "myhost.com", port = 5432, user = "myuser", password = "mypassword")`.
-    * **Crucial Note on Credentials:** Never hardcode passwords directly in scripts shared or committed to version control. Use environment variables, configuration files with restricted access, or RStudio's password management features (`rstudioapi::askForPassword()`).
-    * *Advanced Concept: Connection Pooling:* For applications making frequent database requests (like Shiny apps), connection pooling (e.g., using the `pool` package) can improve performance by reusing existing connections instead of establishing new ones each time.
-3.  **Execute SQL Queries or Statements:**
-    * `dbExecute(connection, "SQL DML statement")`: Used for SQL statements that modify data (Data Manipulation Language - DML) like `INSERT`, `UPDATE`, `DELETE`, or Data Definition Language (DDL) like `CREATE TABLE`, `ALTER TABLE`. It returns the number of rows affected.
-    * `dbGetQuery(connection, "SELECT ... FROM ...")`: Sends a `SELECT` query and retrieves the *entire* result set into an R data frame. Convenient for small to moderately sized results, but **use with extreme caution on queries that might return millions or billions of rows**, as this could exhaust R's memory.
-    * `dbSendQuery(connection, "SELECT ... FROM ...")`: Sends a `SELECT` query to the database but does *not* immediately retrieve any rows. Instead, it returns a "result set" object. This is the preferred method for queries that might return large amounts of data, as it allows for incremental fetching.
-4.  **Fetch Results Incrementally (if using `dbSendQuery`):**
-    * `dbFetch(result_set_object, n = ...)`: Retrieves a specified number (`n`) of rows from the pending result set.
-        * `n = 100`: Fetches the next 100 rows.
-        * `n = -1` or `n = Inf`: Fetches all remaining rows (again, use with caution).
-    * `dbHasCompleted(result_set_object)`: Returns `TRUE` if all rows from the result set have been fetched, `FALSE` otherwise. Often used in a `while` loop for chunk processing.
-    * `dbClearResult(result_set_object)`: **This is a critical step!** Once you are finished fetching data from a result set (or even if you decide not to fetch all of it), you *must* call `dbClearResult()`. This releases the resources (both in R and on the database server) associated with that specific query result. Forgetting this can lead to memory leaks or database connection issues.
-5.  **Disconnect from the Database:**
-    * `dbDisconnect(connection)`: Closes the connection to the database. **This is essential** to free up database resources and ensure that all pending operations are properly finalized. It's good practice to use `tryCatch()` or `on.exit()` to ensure disconnection even if errors occur.
+6\. `dbExecute()`: Execute SQL commands that don't return data (e.g., `CREATE TABLE`, `UPDATE`, `DELETE`).
 
-<div style="text-align:center;">
-<img src="https://placehold.co/700x250/E0EAFC/003D6B?text=R Application <-> DBI API <-> DB Driver (RSQLite, RPostgres) <-> Actual Database System&font=roboto" alt="DBI Architecture Detail" style="border-radius: 8px; max-width:100%; height:auto;">
-</div>
+7\. `dbDisconnect()`: Gracefully close the database connection.
 
-*Real-World Scenario: A data analyst at a Kenyan Sacco (Savings and Credit Cooperative Organization) needs to analyze member loan repayment patterns. They would use `DBI` and an appropriate driver (e.g., `odbc` if the Sacco uses SQL Server, or `RMySQL` if it uses MySQL) to connect to the Sacco's core banking database. They would then write SQL queries, executed via `dbGetQuery` or `dbSendQuery`/`dbFetch`, to extract relevant loan and repayment data for specific periods or member segments for analysis in R.*
+### Example: `RSQLite` with Simulated Kenyan County Data
 
----
-## Our Sandbox: Creating an In-Memory SQLite Database with `ggplot2::diamonds`
+We'll use `RSQLite` which embeds a SQLite database (a lightweight, file-based database) directly into R. Let's simulate some basic data for Kenyan counties.
 
-For demonstration purposes, and to ensure these examples run seamlessly without external database setup, we'll use `RSQLite` to create an **in-memory SQLite database**. This database will exist only for the duration of our R session. We will then populate it with the `ggplot2::diamonds` dataset, which will serve as our moderately large relational table.
+```{r dbi_sqlite_kenya_data_setup}
+# Simulate some Kenyan county data
+kenyan_county_data <- data.frame(
+  County_Code = 1:5, # First 5 counties for brevity
+  County_Name = c("Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu"),
+  Population_2019 = c(1208333, 866820, 1453787, 315943, 143920),
+  Key_Industry = c("Tourism & Logistics", "Mining & Agriculture", "Tourism & Fishing", "Pastoralism & Agriculture", "Fishing & Tourism")
+)
 
-```{r create_db_and_table_enhanced_wordy}
-# Step 1: Establish the connection to an in-memory SQLite database.
-# The ':memory:' directive tells SQLite to create a temporary database in RAM.
-# Alternatively, to create a persistent database file on disk, you would provide a file path,
-# e.g., con <- dbConnect(RSQLite::SQLite(), "path/to/my_diamonds_database.sqlite")
-con <- dbConnect(RSQLite::SQLite(), ":memory:")
-cat("Connection to in-memory SQLite database successfully established.\n")
+# Connect to an in-memory SQLite database.
+# For a persistent database, use a file path: e.g., "kenya_data.sqlite"
+con_kenya <- dbConnect(RSQLite::SQLite(), ":memory:") # In-memory for this demo
 
-# Step 2: Write the R data frame 'diamonds' to a new table named 'diamonds_tbl' within our SQLite database.
-# - 'con' is our database connection object.
-# - '"diamonds_tbl"' is the name we're giving to the table in the database.
-# - 'diamonds' is the R data frame containing the data.
-# - 'overwrite = TRUE' means if a table named 'diamonds_tbl' already exists, it will be replaced. This is useful for rerunning scripts.
-# - 'row.names = FALSE' specifies that R data frame row names should not be written as a separate column in the SQL table.
-dbWriteTable(con, "diamonds_tbl", diamonds, overwrite = TRUE, row.names = FALSE)
-cat("The 'diamonds' R data frame has been successfully written to the 'diamonds_tbl' table in the SQLite database.\n")
+# Write our simulated data to a table named 'CountyDemographics'
+dbWriteTable(con_kenya, "CountyDemographics", kenyan_county_data, overwrite = TRUE) # overwrite = TRUE for demo repeatability
 
-# Step 3: Verify the table creation by listing all tables in the database.
-# dbListTables() returns a character vector of table names.
-cat("Current tables in the database: ", paste(dbListTables(con), collapse=", "), "\n")
-
-# Step 4: Inspect the structure of our newly created 'diamonds_tbl' by listing its fields (columns).
-# dbListFields() returns a character vector of column names for a specified table.
-cat("Fields (columns) in the 'diamonds_tbl' table:\n")
-print(dbListFields(con, "diamonds_tbl"))
-
-# Step 5: Perform a quick integrity check by querying the database for the total number of rows in 'diamonds_tbl'.
-# This should match the number of rows in the original 'diamonds' R data frame (53,940).
-rowCountQuery <- "SELECT COUNT(*) AS total_rows FROM diamonds_tbl"
-rowCountResult <- dbGetQuery(con, rowCountQuery)
-cat("Verification: Total rows counted in 'diamonds_tbl' via SQL: ", rowCountResult$total_rows, "\n")
-cat("Original R dataframe 'diamonds' has", nrow(diamonds), "rows.\n")
-```
-This setup provides us with a realistic, albeit simplified, database environment to practice our R-to-database interactions. All subsequent operations will be performed on this `diamonds_tbl` table residing in our SQLite database.
-
----
-
-## Secure and Efficient Querying: The Power of Parameterized Queries with `DBI`
-
-When constructing SQL queries that incorporate external input (e.g., values from user input, variables in your R script), a naive approach of directly pasting these values into the SQL string is highly dangerous and inefficient. It opens a critical security vulnerability known as **SQL Injection** and can also lead to syntax errors or poor database performance. Parameterized queries (also known as prepared statements) are the professional standard for addressing these issues.
-
-**What is SQL Injection? A Critical Security Threat**
-SQL Injection occurs when malicious SQL code is inserted into a query through input data. If the application constructs SQL queries by simple string concatenation, this malicious code can be executed by the database, potentially leading to:
-* Unauthorized data access (e.g., dumping entire tables of sensitive information).
-* Data modification or deletion.
-* Gaining administrative control over the database server.
-
-*Conceptual Example of an SQL Injection Risk (DO NOT DO THIS):*
-Imagine a web form where a user enters a product ID to search.
-`userInputProductID <- "123; DROP TABLE users; --"` (Malicious input)
-`sql_string <- paste0("SELECT * FROM products WHERE product_id = ", userInputProductID)`
-If executed, this could become: `SELECT * FROM products WHERE product_id = 123; DROP TABLE users; --`
-The database might execute the `DROP TABLE users` command, which would be catastrophic.
-
-**Parameterized Queries: The Solution**
-With parameterized queries, the SQL query structure is defined separately from the data values. Placeholders (like `?` or named placeholders such as `$1`, `:name`) are used in the SQL template. The actual values are then supplied via a separate mechanism (`params` argument in `dbGetQuery` or `dbBind()` with `dbSendQuery`).
-
-**Key Benefits:**
-1.  **Security:** The database driver treats the supplied values strictly as data, not as executable SQL code. It handles proper escaping of characters, effectively neutralizing SQL injection attempts.
-2.  **Correctness:** Avoids syntax errors that can arise from improperly quoted strings or numeric values when concatenating.
-3.  **Efficiency (Potentially):** For databases that support prepared statements, if the same query structure is executed multiple times with different parameters, the database might parse and optimize the query plan only once, leading to faster execution for subsequent calls.
-
-```{r db_parameterized_query_wordy}
-# Let's define some R variables that we want to use in our SQL query conditions.
-target_cut_filter <- "Ideal"
-minimum_carat_filter <- 2.0
-target_color_filter <- "G" 
-
-# Method 1: Using '?' as placeholders in the SQL query.
-# The order of '?' corresponds to the order of values in the 'params' list.
-sql_query_with_q_marks <- "SELECT carat, cut, color, clarity, price 
-                             FROM diamonds_tbl 
-                             WHERE cut = ? AND carat > ? AND color = ?
-                             LIMIT 5"
-
-# Execute the query using dbGetQuery, supplying the R variables via the 'params' argument.
-ideal_diamonds_data_q <- dbGetQuery(con, sql_query_with_q_marks, 
-                                  params = list(target_cut_filter, 
-                                                minimum_carat_filter, 
-                                                target_color_filter))
-
-cat("Query results using '?' placeholders for secure parameterization:\n")
-DT::datatable(ideal_diamonds_data_q, 
-              options = list(pageLength = 5, scrollX = TRUE), 
-              caption = htmltools::tags$caption(style = 'caption-side: top; text-align: center;', 
-                                               'Diamonds: Cut=',target_cut_filter,', Carat >', minimum_carat_filter,', Color=',target_color_filter))
-
-# Example using dbSendQuery and dbFetch with parameters (for potentially larger results or iterative processing)
-sql_query_for_many_results <- "SELECT carat, cut, price FROM diamonds_tbl WHERE color = ? ORDER BY price DESC"
-
-# Send the parameterized query. No data is fetched yet.
-result_set_handle <- dbSendQuery(con, sql_query_for_many_results, params = list("D")) 
-
-# Fetch the first 3 rows from the result set.
-first_three_d_color_diamonds <- dbFetch(result_set_handle, n = 3)
-cat("\nFirst 3 most expensive 'D' color diamonds (fetched incrementally):\n")
-print(first_three_d_color_diamonds)
-
-# CRITICAL: Always clear the result set to free resources.
-dbClearResult(result_set_handle) 
-cat("Result set cleared.\n")
-```
-Using parameterized queries should be your default practice whenever incorporating variable inputs into SQL queries.
-
----
-
-## Unleashing Database Power with R's Elegance: `dbplyr` for Backend Computation
-
-The `dbplyr` package is a game-changer for R users who need to work with data in databases. It allows you to write data manipulation code using the highly popular and intuitive `dplyr` grammar (verbs like `filter`, `select`, `mutate`, `group_by`, `summarise`, `arrange`, `left_join`). `dbplyr` then intelligently translates this R code into the corresponding SQL queries, which are executed directly on the database server. This approach combines the expressive power and readability of `dplyr` with the computational efficiency of the underlying database.
-
-```{r dbplyr_setup_enhanced_wordy}
-# Step 1: Create a 'remote table object' or 'table reference'.
-# This object, 'diamonds_db_ref', doesn't pull any data into R's memory.
-# Instead, it acts as a pointer to the 'diamonds_tbl' table within our database connection 'con'.
-diamonds_db_ref <- tbl(con, "diamonds_tbl")
-
-# Printing this object shows its source (the SQLite database) and the first few rows (a preview).
-cat("This is a dbplyr remote table object:\n")
-print(diamonds_db_ref)
-cat("\nNotice it indicates the source is a SQLiteConnection and shows column names.\n")
+cat("Simulated Kenyan County Data (first 3 rows):\n")
+print(head(kenyan_county_data, 3))
 ```
 
-**The Core `dbplyr` Workflow and Philosophy (Lazy Evaluation):**
-1.  **Define Remote Table:** `tbl(conn, "table_name")` creates the initial object representing the database table.
-2.  **Chain `dplyr` Verbs:** You apply standard `dplyr` data manipulation functions to this remote table object. Each operation modifies the object to represent a more complex query, but *no computation happens on the database yet*. This is known as **lazy evaluation**.
-3.  **Inspect the Query (Optional but Recommended):**
-    * `show_query(remote_table_object)`: Displays the SQL query that `dbplyr` has generated based on your `dplyr` chain. This is invaluable for learning, debugging, and understanding how `dplyr` operations map to SQL.
-    * `explain(remote_table_object)`: Asks the database to provide its *query execution plan* for the generated SQL. This is more advanced and helps in understanding how the database intends to execute the query, which can be useful for performance tuning.
-4.  **Execute and Retrieve (or Store on DB):**
-    * `collect(remote_table_object)`: This is the trigger. `collect()` sends the generated SQL to the database, the database executes it, and the final result set is pulled into R as a standard data frame (tibble).
-    * `compute(remote_table_object, name = "new_temp_table_in_db")`: Sends the SQL to the database and stores the results in a new *temporary table* within the database itself. The function returns a new remote table object pointing to this temporary table. This is extremely useful for breaking down very complex queries into manageable intermediate steps, all performed on the database side without bringing intermediate data into R.
+-   **Interpretation of Simulated Data:**
 
-### Example: `dbplyr` for Advanced Analysis – Ranking Diamonds within Groups
+-   The `kenyan_county_data` data frame we created is a small, tabular representation.
 
-Let's use `dbplyr` to perform a more sophisticated analysis: ranking diamonds by price within each unique combination of `cut` and `color`, and then selecting the top 2 most expensive diamonds from each of these groups. This type of operation often involves SQL **window functions**.
+-   `County_Code`: A unique numerical identifier for each county.
 
-*Real-World Application: This kind of ranking is common. For instance, a sales manager might want to identify the top 3 performing products within each sales region, or an HR analyst might want to find the employees with the highest performance scores within each department.*
+-   `County_Name`: The official name of the county.
 
-```{r dbplyr_window_functions_wordy}
-# We start with our remote table reference 'diamonds_db_ref'.
-# The operations are chained using the pipe operator '%>%'.
-top_diamonds_per_group_ref <- diamonds_db_ref %>%
-  # Step 1: Group the data by 'cut' and 'color'. 
-  # All subsequent window functions will operate within these groups.
-  group_by(cut, color) %>%
-  # Step 2: Define the ordering for the ranking within each group.
-  # We want to rank by price in descending order (most expensive first).
-  # dbplyr < 1.0.0 might use window_order(), newer versions integrate arrange() better.
-  # For modern dbplyr, arrange() before mutate(rank=...) is often sufficient.
-  # Using an explicit window_frame() or similar can be needed for complex windows.
-  # For row_number(), simply ordering before is often enough for dbplyr to translate.
-  arrange(desc(price)) %>% # Order by price descending *within each group*
-  # Step 3: Create a new column 'rank_in_group' using the row_number() window function.
-  # row_number() assigns a sequential integer to each row within its partition (group),
-  # based on the specified order.
-  mutate(rank_in_group = row_number()) %>%
-  # Step 4: Filter to keep only those rows where 'rank_in_group' is 1 or 2 (the top 2).
-  filter(rank_in_group <= 2) %>%
-  # Step 5: Ungroup the data. It's good practice to ungroup after window functions
-  # if subsequent operations don't need the grouping structure.
-  ungroup() %>%
-  # Step 6: Arrange the final result for easier inspection.
-  arrange(cut, color, rank_in_group)
+-   `Population_2019`: The population figure, hypothetically from a census.
 
-# Let's see the SQL query dbplyr generated for this complex operation:
-cat("SQL Query Generated by dbplyr for Ranked Diamonds:\n")
-show_query(top_diamonds_per_group_ref)
+-   `Key_Industry`: A simplified primary economic activity. This data is now ready to be written to our SQLite database.
 
-# Now, let's execute the query and collect the top 10 results into R:
-top_ranked_diamonds_sample_df <- top_diamonds_per_group_ref %>% 
-  head(10) %>% # Take the first 10 rows of the overall result
+### Interacting with the Database
+
+```{r dbi_sqlite_kenya_interact}
+# List tables in our database
+cat("Tables in the 'con_kenya' database:\n")
+db_tables <- dbListTables(con_kenya)
+print(db_tables)
+
+# Retrieve all data from 'CountyDemographics'
+all_county_data_from_db <- dbGetQuery(con_kenya, "SELECT * FROM CountyDemographics")
+cat("\nAll data retrieved from 'CountyDemographics' table:\n")
+print(all_county_data_from_db)
+
+# Retrieve counties with population greater than 1,000,000
+high_pop_counties <- dbGetQuery(con_kenya, "SELECT County_Name, Population_2019 FROM CountyDemographics WHERE Population_2019 > 1000000")
+cat("\nCounties with population > 1,000,000:\n")
+print(high_pop_counties)
+
+# Don't forget to disconnect!
+dbDisconnect(con_kenya)
+cat("\nDisconnected from the SQLite database 'con_kenya'.\n")
+```
+
+**Interpretation of Database Interaction Output:**
+
+-   `dbListTables(con_kenya)` shows us that our table, `CountyDemographics`, was successfully created within the SQLite database.
+
+-   The first `dbGetQuery` call (`SELECT * FROM CountyDemographics`) fetches all columns and rows from our table, mirroring the original `kenyan_county_data` we inserted. This confirms the data is stored correctly.
+
+-   The second `dbGetQuery` demonstrates a basic SQL `WHERE` clause. It filters and returns only the names and populations of counties (`Mombasa`, `Kilifi`) whose 2019 population exceeds 1 million. This is a fundamental database operation: querying for specific subsets of data.
+
+## 1.3 `dplyr` & `dbplyr`: Speaking R to Your Database
+
+The `dbplyr` package is a "creative genius" itself! It allows you to write familiar `dplyr` code (verbs like `filter`, `select`, `mutate`, `group_by`, `summarise`) that `dbplyr` translates into SQL queries executed directly by the database.
+
+**Advantages:**
+
+-   **Familiar Syntax:** Reduces the cognitive load of switching between R and SQL.
+
+-   **Database-Side Processing:** Computations happen in the database, which is optimized for them. Only the results are brought into R. This is crucial for large datasets.
+
+-   **Lazy Evaluation:** `dplyr` commands on database tables build up a query plan. The SQL is executed only when you explicitly request data (e.g., via `collect()`) or compute a result.
+
+### Example: Analyzing `nycflights13` Data (Analogous to Kenyan Aviation/Logistics)
+
+Let's use the `flights` data from `nycflights13`. Imagine this dataset represented all flights handled by the Kenya Airports Authority (KAA) or logistics movements for a large East African company.
+
+```{r dbplyr_flights_setup}
+# Establish a new in-memory SQLite connection
+con_flights_dplyr <- dbConnect(RSQLite::SQLite(), ":memory:")
+
+# Copy the 'flights' and 'airports' data from nycflights13 into our SQLite database
+# In a real-world scenario, this data would already reside in an enterprise database.
+copy_to(con_flights_dplyr, nycflights13::flights, "flights_log", temporary = FALSE, overwrite = TRUE,
+        indexes = list(c("year", "month", "day"), "carrier", "origin", "dest"))
+copy_to(con_flights_dplyr, nycflights13::airports, "airport_details", temporary = FALSE, overwrite = TRUE,
+        indexes = list("faa"))
+
+
+cat("Tables in 'con_flights_dplyr' database:\n")
+print(dbListTables(con_flights_dplyr))
+
+# Create 'table references' (these don't pull data into R yet)
+flights_db_ref <- tbl(con_flights_dplyr, "flights_log")
+airports_db_ref <- tbl(con_flights_dplyr, "airport_details")
+
+cat("\nStructure of the 'flights_db_ref' (a remote table reference):\n")
+print(flights_db_ref) # Notice it shows source and column names, not the data itself.
+```
+
+**Interpretation of `dbplyr` Setup:** \* `copy_to(...)` has efficiently moved the `nycflights13::flights` and `nycflights13::airports` R data frames into two tables, `flights_log` and `airport_details` respectively, within our SQLite database `con_flights_dplyr`. Indexes are suggested to potentially speed up queries on those columns. \* `tbl(con_flights_dplyr, "flights_log")` creates `flights_db_ref`. This object is not the data itself, but a *pointer* or *reference* to the `flights_log` table in the database. The output confirms this by showing `Source: table<flights_log> [?? x 19]`. The `??` indicates that `dbplyr` doesn't know the exact row count without querying, reinforcing that data isn't in R's memory yet.
+
+### Querying with `dplyr` Verbs
+
+```{r dbplyr_flights_query}
+# Find the average departure delay for flights from JFK to Los Angeles (LAX)
+# broken down by carrier.
+jfk_to_lax_delays <- flights_db_ref %>%
+  filter(origin == "JFK", dest == "LAX", !is.na(dep_delay)) %>%
+  group_by(carrier) %>%
+  summarise(
+    average_departure_delay = mean(dep_delay, na.rm = TRUE),
+    number_of_flights = n() # dplyr::n() translates to SQL COUNT(*)
+  ) %>%
+  filter(number_of_flights > 10) %>% # Only carriers with a decent number of flights
+  arrange(desc(average_departure_delay))
+
+# Show the SQL query that dbplyr generated
+cat("SQL query generated by dbplyr:\n")
+show_query(jfk_to_lax_delays)
+
+# Execute the query and bring results into R
+jfk_to_lax_delays_local <- jfk_to_lax_delays %>% collect()
+
+cat("\nAverage departure delay (JFK to LAX) by carrier (collected into R):\n")
+print(jfk_to_lax_delays_local)
+
+# Let's join with airport data to get airport names
+# Suppose we want to see top 5 destination airports from "EWR" by flight count
+top_ewr_destinations <- flights_db_ref %>%
+  filter(origin == "EWR") %>%
+  group_by(dest) %>%
+  summarise(flight_count = n()) %>%
+  arrange(desc(flight_count)) %>%
+  head(5) %>% # Take top 5 in the database query itself
+  left_join(airports_db_ref, by = c("dest" = "faa")) %>% # Join to get airport name
+  select(destination_airport_name = name, flight_count) %>%
   collect()
 
-cat("\nSample of Top 2 Priciest Diamonds per Cut/Color Group (executed on DB):\n")
-DT::datatable(top_ranked_diamonds_sample_df, 
-              caption = htmltools::tags$caption(style = 'caption-side: top; text-align: center;', 
-                                               'Sample: Top 2 Priciest Diamonds per Cut/Color Group'), 
-              options = list(scrollX=TRUE, pageLength = 10)) # Show all 10 for this sample
-```
-This example demonstrates how `dbplyr` allows you to express complex analytical logic in R, which is then translated into efficient SQL, harnessing the full power of the database for computation.
+cat("\nTop 5 destinations from EWR with airport names:\n")
+print(top_ewr_destinations)
 
----
 
-## Visual Storytelling with Data from Databases: The `ggplot2` and `plotly` Synergy
-
-Visualizing raw, multi-million-row datasets directly is often impractical and can lead to overplotting or performance issues. A more effective strategy, especially when data resides in a database, is:
-1.  **Summarize/Aggregate in the Database:** Use SQL queries (directly via `DBI` or through `dbplyr`) to perform initial aggregations, calculations, or filtering directly on the database server. This reduces the data volume significantly.
-2.  **Collect the Summarized Result:** Bring the much smaller, aggregated data into R using `dbGetQuery` or `collect()`.
-3.  **Visualize in R:** Use powerful R visualization libraries like `ggplot2` (for static, publication-quality plots) and `plotly` (for interactive web-based plots) on this summarized data.
-
-Let's create some visualizations based on aggregated data from our `diamonds_tbl`.
-
-```{r dbplyr_plot_enhanced_interactive_wordy, fig.width=10, fig.height=5.5}
-# Step 1: Use dbplyr to calculate summary statistics (average price, average carat, count)
-# for each diamond 'cut'. This computation happens on the database.
-summary_stats_by_cut <- diamonds_db_ref %>%
-  group_by(cut) %>%
-  summarise(
-    average_price = mean(price, na.rm = TRUE),
-    average_carat = mean(carat, na.rm = TRUE),
-    number_of_diamonds = n()
-  ) %>%
-  # Step 2: Collect the summarized results into an R data frame.
-  collect() %>%
-  # Step 3 (Optional R-side prep): Ensure 'cut' is an ordered factor for logical plot ordering.
-  mutate(cut = factor(cut, levels = c("Fair", "Good", "Very Good", "Premium", "Ideal"))) 
-
-cat("Summarized data collected from database for plotting:\n")
-print(summary_stats_by_cut)
-
-# Plot 1: Average Diamond Price by Cut (using ggplot2, then making it interactive)
-# We add a 'text' aesthetic for custom tooltips when converted to plotly.
-plot_avg_price_gg <- ggplot(summary_stats_by_cut, 
-                            aes(x = cut, y = average_price, fill = cut,
-                                text = paste("Cut Quality:", cut, 
-                                             "<br>Avg. Price:", dollar(average_price, accuracy = 1),
-                                             "<br>Count:", number_format(accuracy=1)(number_of_diamonds)))) +
-  geom_col(show.legend = FALSE) +
-  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  scale_fill_viridis_d(option = "plasma", guide = "none") + 
-  labs(
-    title = "Average Diamond Price by Cut Quality",
-    subtitle = "Data aggregated from SQLite database via dbplyr",
-    x = "Diamond Cut Quality",
-    y = "Average Price (USD)"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.title = element_text(face="bold", size=16),
-        plot.subtitle = element_text(size=11))
-
-# Convert ggplot2 object to an interactive plotly object
-interactive_avg_price_plot <- ggplotly(plot_avg_price_gg, tooltip = "text")
-
-# Display the interactive plot
-print(interactive_avg_price_plot)
+dbDisconnect(con_flights_dplyr)
+cat("\nDisconnected from 'con_flights_dplyr' database.\n")
 ```
 
----
-## Interactive Drill-Down: Distribution Analysis with `plotly`
+**Interpretation of `dbplyr` Querying:**
 
-Let's continue our visual exploration by examining the distribution of diamond `price`, faceted by `cut`. For such analyses, especially with prices that can span orders of magnitude, using a logarithmic scale for the price axis is often insightful. We'll fetch a relevant subset using `dbplyr` and then create an interactive density plot.
+-   `show_query(jfk_to_lax_delays)` reveals the SQL that `dbplyr` constructed from our `dplyr` chain. Notice how `filter` translates to `WHERE`, `group_by` to `GROUP BY`, `summarise` with `mean()` and `n()` to `AVG()` and `COUNT()`, and `arrange` to `ORDER BY`. This is the magic: R code generating database code.
 
-```{r interactive_density_plot_fast, fig.width=9, fig.height=6}
-# Sample a smaller subset to speed up rendering
-set.seed(42)
-diamonds_subset <- ggplot2::diamonds %>%
-  filter(cut %in% c("Fair", "Ideal", "Premium")) %>%
-  sample_n(3000) %>%
-  select(price, cut, carat)
+-   `jfk_to_lax_delays_local`: The `collect()` call executes the SQL and brings the aggregated results into R. The table shows carriers flying from JFK to LAX, their average departure delay for this route, and the count of such flights. For example, Endeavor Air Inc. ("9E") had, on average, the highest departure delay among carriers with more than 10 flights on this route.
 
-diamonds_subset$cut <- factor(diamonds_subset$cut, levels = c("Fair", "Premium", "Ideal"))
+-   `top_ewr_destinations`: This demonstrates a join operation. The `dplyr` code first found the top 5 destination airport codes (`dest`) from "EWR", then joined this result with the `airport_details` table (using the `faa` code as the key) to fetch the full airport names (`name`). The final collected table shows these airport names and their corresponding flight counts from EWR, ordered by popularity. This entire complex operation was planned in R, executed efficiently by the database.
 
-p <- ggplot(diamonds_subset, aes(
-    x = price, 
-    fill = cut,
-    text = paste("Cut:", cut, "<br>Price:", dollar(price))
-  )) +
-  geom_density(alpha = 0.65, adjust = 1.5) +
-  scale_x_log10(
-    labels = dollar_format(prefix = "$"), 
-    breaks = c(500, 1000, 2000, 5000, 10000, 18000)
-  ) +
-  scale_fill_viridis_d(option = "magma") +
-  labs(
-    title = "Sampled Interactive Price Distribution by Diamond Cut",
-    subtitle = "Subset of 3,000 diamonds for faster rendering",
-    x = "Price (USD, Log Scale)",
-    y = "Density",
-    fill = "Cut"
-  ) +
-  facet_wrap(~cut, ncol = 1, scales = "free_y") +
-  theme_light(base_size = 12) +
-  theme(
-    strip.background = element_rect(fill = "grey85"),
-    strip.text = element_text(face = "bold", color = "white"),
-    plot.title = element_text(face = "bold", size = 15),
-    legend.position = "top"
+------------------------------------------------------------------------
+
+# Part 2: Conquering "Big Data" with R (Approx. 30 minutes)
+
+## 2.1 What is "Big Data"? A Clinical Definition in the R Context
+
+While "Big Data" is broadly defined by the "Vs" (Volume, Velocity, Variety, Veracity, Value), from the perspective of an R user on a typical machine, **Big Data pragmatically refers to any dataset that poses significant challenges to being processed effectively within the available system memory (RAM) or within acceptable timeframes using standard R functions.**
+
+This often manifests as:
+
+**Volume:** The dataset is too large in gigabytes (GB) or terabytes (TB) to be loaded entirely into R's memory using functions like `read.csv()`. This leads to "cannot allocate vector of size..." errors.
+
+**Computational Intensity:** Even if a dataset fits in memory, operations on it (e.g., joins, aggregations, complex calculations on millions/billions of rows) are excessively slow with base R or non-optimized approaches.
+
+**Velocity/Variety (Secondary in R context):** While R can handle streaming data (`pins`, `kafkaR`) or diverse data types (text, images), the primary "big data" bottleneck for many R users is often memory constraints with tabular data.
+
+***Relatable Examle:*** *Imagine analyzing the complete M-Pesa transaction log for a single day across Kenya. This could be millions, if not tens of millions, of records. Loading this entire dataset into R on a standard laptop using `read.csv()` would likely fail due to insufficient RAM. This is a "Volume" challenge.* *Alternatively, consider detailed GPS tracking data from thousands of matatus in Nairobi over a year, recorded every few seconds. The sheer number of data points presents a significant analytical hurdle.*
+
+## 2.2 Strategies for Taming Large Datasets in R
+
+### Strategy 1: Efficient Data Ingestion – `data.table::fread()`
+
+Base R's `read.csv()` is not optimized for speed or memory on large files. `data.table::fread()` is a superhero here.
+
+```{r fread_demo_prep}
+# Simulate a larger CSV file (e.g., representing customer transaction data)
+# For demonstration, 2 million rows.
+if (!file.exists("kenya_sim_transactions.csv")) {
+  cat("Creating 'kenya_sim_transactions.csv' (2 million rows). This may take a moment...\n")
+  num_transactions <- 2e6
+  sim_transactions <- data.frame(
+    transaction_id = paste0("TRX", 1:num_transactions),
+    customer_id = sample(paste0("CUST", 1000:5000), num_transactions, replace = TRUE),
+    transaction_amount_ksh = round(rlnorm(num_transactions, meanlog = log(1500), sdlog = log(2.5)), 2), # Log-normal distribution for amounts
+    transaction_date = as.Date("2023-01-01") + sample(0:364, num_transactions, replace = TRUE),
+    branch_code = sample(paste0("BRANCH", c("001", "002", "003", "004", "005")), num_transactions, replace = TRUE)
   )
-
-ggplotly(p, tooltip = "text")
-```
-*Interpreting Interactive Density Plots:* These plots help visualize the shape of the price distribution for different cuts. The log scale on the x-axis helps to see variations across a wide range of prices. The `alpha` transparency allows seeing overlapping densities if they were not faceted. Interactivity (zooming, panning) allows for closer inspection of specific price ranges.
-*Real-World Example: A marketing analyst for an online electronics retailer might use similar interactive density plots to understand price distributions of different smartphone brands, helping to identify market segments and competitive pricing strategies. The data would be pulled from the company's sales database.*
-
----
-
-## Dynamic Data Slicing: Truly Interactive Exploration with `crosstalk`
-
-The `crosstalk` package elevates interactivity to a new level by enabling **linked brushing and filtering** across multiple HTML widgets within an R Markdown document or Shiny application. This means actions performed in one widget (like selecting rows in a table or a category from a filter) can dynamically update other linked widgets (like plots). This creates a powerful environment for exploratory data analysis (EDA).
-
-Let's create a dashboard-like view using a sample of our `diamonds` data, linking a filter control, an interactive data table, and an interactive scatter plot.
-
-```{r crosstalk_example_wordy, fig.height=7.5, fig.width=11, layout="l-body-outset"}
-# For smoother performance in a live presentation, especially with many points,
-# it's often wise to work with a reasonably sized sample of the data.
-diamonds_sample_for_crosstalk <- diamonds %>% 
-  filter(carat < 2.5) %>% # Filter out extreme outliers for better plot scaling
-  sample_n(3000) # Take a random sample of 3000 diamonds
-
-# Step 1: Create a SharedData object.
-# This object wraps our data frame and allows different widgets to share selection/filtering information.
-# We can specify a 'key' column if we have unique row identifiers, or use row indices by default.
-# `group` specifies a name for the set of linked widgets.
-shared_diamonds_data <- SharedData$new(diamonds_sample_for_crosstalk, group = "diamonds_exploration")
-
-# Step 2: Define crosstalk filter controls.
-# Here, we'll create a dropdown filter for 'cut' and a slider for 'carat'.
-filter_cut_ui <- filter_select(
-  id = "cut_filter_crosstalk", # Unique ID for the filter
-  label = "Filter by Cut:",   # Label displayed above the dropdown
-  sharedData = shared_diamonds_data, # The shared data object to link to
-  group = ~cut                # The column in shared_diamonds_data to filter on
-)
-
-filter_carat_ui <- filter_slider(
-  id = "carat_filter_crosstalk",
-  label = "Filter by Carat:",
-  sharedData = shared_diamonds_data,
-  column = ~carat, # The numeric column for the slider
-  step = 0.1,      # Slider step size
-  width = "100%"   # Width of the slider control
-)
-
-
-# Step 3: Create linked HTML widgets (a DT datatable and a plotly scatterplot).
-# These widgets will also use the 'shared_diamonds_data' object.
-
-linked_interactive_table <- DT::datatable(
-  shared_diamonds_data, 
-  style = "bootstrap",
-  class = "compact",
-  width = "100%",
-  options = list(
-    pageLength = 6, 
-    dom = 'Bfrtip', # Adds Buttons, filtering, pagination etc.
-    buttons = list(
-      list(extend = 'colvis', columns = ':not(.noVis)'), # Column visibility button
-      'copy', 'csv'                                     # Copy and CSV buttons
-    )
-  ),
-  extensions = "Buttons",
-  caption = htmltools::tags$caption(style = 'caption-side: bottom; text-align: center;', 
-                                   'Interactive Diamond Data Table (linked with plot and filters)')
-)
-
-linked_interactive_scatterplot <- plot_ly(
-  shared_diamonds_data, 
-  x = ~carat, 
-  y = ~price, 
-  color = ~cut, # Color points by cut
-  colors = "viridis", # Use viridis color scale
-  text = ~paste("Price:", dollar(price), "<br>Carat:", carat, 
-                "<br>Cut:", cut, "<br>Clarity:", clarity),
-  hoverinfo = "text" # Show only custom text on hover
-) %>%
-  add_markers(alpha = 0.6) %>% # Use markers for scatter plot
-  layout(
-    title = "Price vs. Carat of Diamonds (Interactive & Linked)",
-    xaxis = list(title = "Carat Weight"),
-    yaxis = list(title = "Price (USD)"),
-    dragmode = "lasso", # Enable lasso selection (or "select" for box selection)
-    legend = list(orientation = "h", x = 0.1, y = -0.2) # Horizontal legend below plot
-  ) %>%
-  highlight(on = "plotly_selected", off = "plotly_deselect", color = "red", dynamic = TRUE) # Highlight selected points
-
-# Step 4: Arrange the controls and widgets in the UI.
-# `bscols` provides a simple way to create a column-based layout.
-# You can also use standard R Markdown div structures or Shiny UI functions.
-bscols(
-  widths = c(3, 9), # Define relative widths for two columns
-  list( # First column for controls
-    filter_cut_ui,
-    htmltools::br(), # Add some space
-    filter_carat_ui
-  ),
-  list( # Second column for the plot and table
-    linked_interactive_scatterplot,
-    htmltools::hr(), # Horizontal rule for separation
-    linked_interactive_table
-  )
-)
-```
-*Demonstrating the Power:* When this R Markdown is rendered to HTML, you will see the filter dropdown, the slider, the scatter plot, and the data table.
-* Try selecting a specific "Cut" from the dropdown: both the scatter plot and the data table will dynamically update to show only diamonds of that cut.
-* Adjust the "Carat" slider: the plot and table will filter to the selected carat range.
-* Use the lasso or box select tool (from the `plotly` modebar on the scatter plot) to select a group of points: the selected points will be highlighted (and, depending on further `crosstalk` options, the table could also filter to these points).
-
-This dynamic, linked interaction is invaluable for EDA, allowing for rapid hypothesis testing and pattern discovery directly within your analytical environment.
-*Real-World Example: A government agency like the Kenya National Bureau of Statistics (KNBS) could use a `crosstalk`-powered dashboard to allow policymakers to interactively explore census data. They could filter by county, age group, or education level and see linked charts (e.g., employment rates, access to amenities) and tables update instantly, facilitating evidence-based policy making.*
-
----
-
-## Navigating Data Oceans: Strategies for Handling Datasets Larger Than RAM
-
-While R's in-memory processing is fast, the primary constraint is the available RAM. When datasets or intermediate results become too large to fit (your ZBook has 16GB, which is generous but not infinite), you need robust strategies.
-
-1.  **Prioritize Database-Side Processing (Your First Line of Defense):**
-    * **Mechanism:** As demonstrated extensively with `dbplyr` and direct SQL, perform as much filtering, aggregation, joining, and transformation as possible directly within the database system before pulling any data into R. Databases are optimized for these operations on large volumes.
-    * **Why:** This dramatically reduces the size of the data that needs to be transferred over the network and loaded into R's memory. You `collect()` only the final, much smaller, result set needed for R-specific analysis (e.g., advanced statistical modeling, bespoke visualization).
-    * *Scenario:* An analyst at an e-commerce company wants to find the average monthly spending per customer for the last year. The raw transaction table has billions of rows. Instead of pulling all transactions into R, they write a SQL query (or `dbplyr` equivalent) that calculates these monthly averages directly on the database server. Only the result (customer ID, average monthly spend) – a much smaller table – is `collect()`-ed into R.
-
-2.  **Chunking / Streaming (Iterative Processing):**
-    * **Mechanism:** Read and process the data in smaller, manageable pieces (chunks) instead of loading the entire dataset at once.
-        * From Databases: Use `dbSendQuery()` to initiate the query, then loop with `dbFetch(n = chunk_size)` to retrieve and process `chunk_size` rows at a time. Remember `dbClearResult()`.
-        * From Large Local Files (e.g., CSVs, text files): Packages like `readr` (with `read_csv_chunked()`) or `arrow` (with `open_dataset()` and iterating over record batches) provide functions to read files piece by piece.
-    * **Processing within the loop:** For each chunk, you might:
-        * Update running aggregates (e.g., sum, count, mean).
-        * Perform transformations and write the processed chunk to a new file (e.g., as Parquet files using `arrow::write_parquet()`).
-        * Train or update a machine learning model incrementally if the algorithm supports online learning.
-    * *Scenario:* Processing daily server log files (gigabytes each) to extract error patterns. Each log file is read in chunks of 100,000 lines. For each chunk, lines containing "ERROR" are filtered, relevant information is parsed, and these error summaries are appended to a daily error report database.
-
-3.  **Strategic Sampling (Representative Insights):**
-    * **Mechanism:** If an exact calculation on the entire dataset is too costly or time-consuming for an initial exploration or model prototyping, analyzing a statistically representative random sample can provide valuable insights and quick estimates.
-    * **How in R:** For data already in R (or a manageable chunk), `dplyr::sample_n()` (fixed number) or `dplyr::sample_frac()` (fixed fraction) are useful. For data in databases, some SQL dialects offer `TABLESAMPLE` clauses or functions like `ORDER BY RANDOM() LIMIT N` (though the latter can be inefficient on very large tables without proper indexing). A more robust database sampling approach might involve fetching a sample of primary keys and then querying for those specific records.
-    * *Scenario:* A data scientist wants to build a preliminary customer churn prediction model for a telco with millions of subscribers. To iterate quickly on feature engineering and model selection, they might initially work with a 10% random sample of the customer base, ensuring the sample reflects the overall demographics and usage patterns.
-
-4.  **`data.table` for Hyper-Efficient In-Memory Chunk Processing:**
-    * **Mechanism:** When a chunk of data *is* loaded into R's memory (e.g., via `dbFetch` or `fread`), using `data.table` for its manipulation can be significantly faster and more memory-efficient than base R data frames or even `dplyr` on local data frames for certain operations.
-    * *Scenario:* After fetching a chunk of 1 million transaction records from a database into R, an analyst uses `data.table`'s fast grouping `[, .(.N, sum_amount = sum(amount)), by = .(product_category, region)]` to quickly aggregate sales within that chunk before combining it with results from other chunks.
-
-5.  **Leveraging Distributed Computing Frameworks (For Truly Massive Scale):**
-    * **Mechanism:** For datasets that are too large for a single machine (even with chunking), tools like Apache Spark (via `sparklyr` in R) or Dask (more Python-centric but can be called from R via `reticulate`) distribute the data and computations across a cluster of multiple machines. The `arrow` R package plays a crucial role here by providing efficient in-memory data formats and inter-process communication, facilitating movement of data between R, Spark, and other systems.
-    * *Scenario:* Analyzing years of global weather satellite imagery (petabytes of data) to identify long-term climate change patterns. This task would be distributed across a Spark cluster, with R (`sparklyr`) used to define the analytical jobs and collect summarized results.
-
-Choosing the right strategy, or often a combination of these, depends on the data size, the available infrastructure, and the specific analytical goals.
-
----
-
-## `data.table`: The Speed Demon for In-Memory Data Manipulation in R
-
-Once you have a dataset (or a substantial chunk of it) residing in R's memory, the `data.table` package provides a high-performance toolkit that can dramatically speed up your data manipulation tasks. It's renowned for its concise syntax and C-optimized backend, making it significantly faster and more memory-efficient than base R data frames for many common operations like subsetting, grouping, ordering, and joining.
-
-**The Core Philosophy: `DT[i, j, by]`**
-The general form of a `data.table` query is `DT[i, j, by]`, which can be read as: "From `data.table` `DT`, subset/reorder rows using `i`, then calculate `j` (select, compute, or update columns), grouped by `by`."
-
-* `i`: Row filtering conditions (analogous to SQL `WHERE` or `dplyr::filter()`). Uses column names directly.
-* `j`: Column operations (analogous to SQL `SELECT` or `dplyr::select()`/`summarise()`/`mutate()`). Uses the special `.()` alias for `list()`.
-    * Select columns: `DT[, .(colA, colB)]`
-    * Compute new columns: `DT[, .(new_col = colA / colB, another_col = toupper(colC))]`
-    * The `:=` operator is used to add or update columns *by reference* (in-place), which is highly memory efficient as it avoids copying the entire table.
-* `by`: Grouping columns (analogous to SQL `GROUP BY` or `dplyr::group_by()`). Operations in `j` are then performed for each group. `.N` is a special variable holding the number of rows in the current group.
-
-```{r data_table_example_enhanced_wordy}
-# Convert the R data frame 'diamonds' to a data.table.
-# This conversion itself is very fast.
-diamonds_dt <- as.data.table(diamonds)
-cat("Converted 'diamonds' to a data.table object.\n")
-
-# Example 1: Complex aggregation – find average price, median carat, and count of diamonds
-# for each combination of 'cut' and 'clarity', but only for diamonds with price > $15,000.
-# Then, order the results by the count in descending order.
-advanced_summary_dt <- diamonds_dt[price > 15000,  # 'i' part: filter rows
-                                   .( # 'j' part: list of expressions to compute
-                                     average_price = mean(price),
-                                     median_carat = median(carat),
-                                     count_in_group = .N # .N is a special symbol for count in by-group
-                                   ), 
-                                   by = .(cut, clarity) # 'by' part: grouping columns
-                                  ][order(-count_in_group)] # Chain ordering directly
-
-cat("\nAdvanced Summary (Price > $15,000, by Cut/Clarity), ordered by count:\n")
-DT::datatable(head(advanced_summary_dt, 10), 
-              caption = htmltools::tags$caption(style = 'caption-side: top; text-align: center;', 
-                                               'Top Diamond Groups by Count (Price > $15k)'),
-              options = list(pageLength = 5, scrollX=TRUE))
-
-# Example 2: Update by reference using `:=` for efficiency.
-# Add a 'price_per_carat' column, but only for 'Ideal' cut diamonds.
-# This modifies 'diamonds_dt' in-place, without making a full copy.
-diamonds_dt[cut == "Ideal", price_per_carat := price / carat]
-cat("\n'price_per_carat' column added by reference for 'Ideal' cut diamonds.\n")
-cat("Sample of Ideal diamonds with the new column:\n")
-# Show a few columns including the new one for verification.
-print(head(diamonds_dt[cut == "Ideal" & !is.na(price_per_carat), 
-                      .(carat, price, cut, price_per_carat)], 5))
-
-# Example 3: Efficiently add a new column calculated by group.
-# For each diamond, add a column showing the average price of its 'cut' category.
-# This is another powerful use of `:=` with `by`.
-diamonds_dt[, avg_price_of_its_cut := mean(price), by = cut]
-cat("\n'avg_price_of_its_cut' column added, showing average price for each diamond's cut category.\n")
-cat("Sample showing price vs. average price for its cut:\n")
-print(head(diamonds_dt[, .(cut, price, avg_price_of_its_cut)], 10))
-
-# Note on Keys: For even faster subsetting and joins, you can set keys on a data.table
-# using setkey(DT, col1, col2). Operations on keyed columns then use a fast binary search.
-```
-*Real-World Application: A financial analyst at the Nairobi Securities Exchange (NSE) receives large daily data files of stock trades (tick data). After reading a day's file (potentially millions of rows) into R using `fread()` (a fast file reader from `data.table`), they use `data.table`'s speed to rapidly calculate volume-weighted average prices (VWAP), identify arbitrage opportunities between related securities, or aggregate trades into minute-level bars for time series analysis, all within seconds or minutes.*
-
----
-## Optimizing Your Data Journey: Key Performance Considerations with R & Databases
-
-Achieving optimal performance when working with R and databases involves understanding potential bottlenecks across the entire workflow—from the database server itself, through data transfer, to R's in-memory processing. Here are critical factors to consider:
-
-* **On the Database Server Side – The Foundation of Speed:**
-    * **Effective Indexing (The Database's Speed-Reading Tool):**
-        * *What:* Indexes are special lookup tables that the database search engine can use to speed up data retrieval. Think of them like the index in the back of a book.
-        * *Why:* Without indexes, the database might have to scan entire tables (a "full table scan") to find rows matching your query conditions, which is very slow for large tables. With an appropriate index on columns used in `WHERE` clauses, `JOIN` conditions, or `ORDER BY` clauses, the database can locate the relevant data much faster.
-        * *Types (Conceptual):* B-tree indexes are common for range queries (e.g., `price > 1000`) and equality. Hash indexes can be faster for exact matches.
-        * *Action:* While creating indexes is often a DBA's role, data scientists should understand their importance and communicate with DBAs about query patterns to ensure relevant columns are indexed.
-    * **Efficient SQL Query Design:**
-        * *Why:* Poorly written SQL can cripple performance even on well-indexed databases.
-        * *Action:*
-            * Be specific: `SELECT` only the columns you actually need, not `SELECT * `.
-            * Filter early: Apply `WHERE` clauses to reduce the dataset as much as possible, as early as possible in the query.
-            * Optimize joins: Ensure join conditions are on indexed columns and that join types (INNER, LEFT, etc.) are appropriate.
-            * Avoid complex operations in `WHERE` clauses that prevent index usage (e.g., functions on indexed columns).
-    * **Database Query Optimizer & `EXPLAIN`:**
-        * *What:* Modern databases have sophisticated query optimizers that try to find the most efficient way to execute your SQL.
-        * *Action:* Use the `EXPLAIN` command (available in most SQL dialects; `dbplyr::explain()` provides an interface) to see the database's chosen execution plan. This can reveal if it's using indexes, performing costly scans, or choosing suboptimal join methods. Understanding the plan helps in rewriting queries or suggesting new indexes.
-    * **Database Server Resources:** The CPU power, RAM, I/O throughput, and configuration of the database server itself are fundamental performance determinants.
-
-* **Data Transfer – The Bridge Between Database and R:**
-    * **Minimize Volume:** The single most important factor is to transfer as little data as possible from the database to R. Leverage database-side aggregation and filtering.
-    * **Network Latency & Bandwidth:** The speed and reliability of the network connection between the R environment and the database server can be a significant factor, especially for remote databases.
-    * **Data Formats & Drivers:** Some drivers or data transfer methods might be more efficient than others. The `arrow` package, for example, aims to provide highly efficient data transfer.
-
-* **Within R – Efficient In-Memory Operations:**
-    * **R's Memory Model:** R generally loads all objects into RAM. Be mindful of object sizes (`object.size()`). Remove large, unneeded objects (`rm()`) and call `gc()` (garbage collect) occasionally if memory is tight, though good coding practices are more effective than frequent `gc()` calls.
-    * **Vectorized Operations:** R is optimized for vectorized operations. Use functions that operate on entire vectors or columns at once (e.g., `sum(my_vector)`, `my_vector * 2`) rather than R-level loops (like `for` loops operating row-by-row on a data frame), which are typically much slower. `dplyr` and `data.table` functions are heavily vectorized.
-    * **Choice of Data Structures:** `data.table` is generally more performant for large in-memory datasets than base R data frames. Tibbles (from `dplyr`/`tibble`) have some overhead compared to `data.table` for raw speed but offer other conveniences.
-    * **Profiling R Code:** Use tools like `profvis` or `Rprof` to identify bottlenecks within your R code if you suspect R-side processing is slow.
-
-By considering these factors at each stage, you can build data analysis pipelines that are not only correct but also efficient and scalable.
-
----
-
-## Strategic Choices: SQL vs. `dbplyr` vs. `data.table` – When to Use What
-
-You have several powerful options for interacting with and manipulating data when R is part of your workflow. Understanding their strengths and typical use cases will help you choose the most appropriate tool (or combination of tools) for each task.
-
-| Feature/Aspect         | Direct SQL (via `DBI`)                                  | `dbplyr` (R syntax, DB execution)                         | `data.table` (R syntax, In-Memory R execution) |
-|------------------------|---------------------------------------------------------|-----------------------------------------------------------|------------------------------------------------|
-| **Primary Execution Locus** | Runs directly on the Database Server.                   | Translates R (`dplyr`) code to SQL; SQL runs on Database Server. | Runs directly in R's memory (RAM).               |
-| **Syntax Language** | Native SQL dialect of the connected database.           | `dplyr` verbs and R syntax.                               | `data.table`'s specific, concise R syntax (`DT[i,j,by]`). |
-| **Readability & Abstraction**| SQL readability varies; can become very complex. No abstraction over SQL. | High for R users familiar with `dplyr`. Abstracts away SQL complexities. | Very concise, can be dense for newcomers but highly expressive for initiated users. |
-| **Database Portability** | SQL may need minor tweaks for different DB dialects.    | Highly portable; `dbplyr` handles SQL translation for many common backends. | Not applicable (operates on R objects).        |
-| **Typical Performance Focus**| Leverages full database optimization, good for highly tuned queries, stored procedures. | Leverages database optimization via translated SQL. Overhead of translation is usually negligible compared to data processing time. | Extremely fast for operations on data already in R's RAM due to C optimization and efficient algorithms. |
-| **Ideal Data Scale for Operation** | Suitable for operations on entire very large datasets (TB+, PBs) residing in the DB. | Suitable for operations on entire very large datasets residing in the DB. | Best for datasets that fit comfortably in R's available RAM (or chunks thereof). |
-| **Primary Use Cases & Scenarios** | <ul><li>Executing complex, pre-written SQL scripts or stored procedures.</li><li>Needing fine-grained control over SQL generation.</li><li>Utilizing DB-specific SQL features not easily accessible via `dbplyr`.</li><li>Initial data extraction if `dplyr` translation is suboptimal for a specific query.</li></ul> | <ul><li>Iterative data exploration and manipulation directly on database tables using familiar `dplyr` syntax.</li><li>Offloading filtering, aggregation, and joins to the database server.</li><li>Prototyping data pipelines that will eventually run on the database.</li><li>When SQL expertise is limited but `dplyr` skills are strong.</li></ul> | <ul><li>High-performance manipulation (subsetting, grouping, joining, updates) of data frames already loaded into R (e.g., after `collect()`-ing from `dbplyr` or reading from a file with `fread()`).</li><li>Processing chunks of data iteratively in R.</li><li>When speed of in-memory computation is paramount.</li></ul> |
-| **Learning Curve** | Requires solid SQL knowledge.                           | Requires `dplyr` knowledge. Understanding basic SQL helps for `show_query()`. | `data.table` has its own syntax idioms which require dedicated learning but pay off in performance. |
-
-**Synergistic Usage – Not an Either/Or:**
-It's crucial to understand that these tools are often used **in combination** within a single analysis workflow:
-1.  You might use `DBI` with direct SQL to call a complex stored procedure that performs initial data shaping in the database.
-2.  Then, use `dbplyr` to connect to the resulting table (or another table) and perform further `dplyr`-style filtering and aggregation on the database side.
-3.  `collect()` the summarized, smaller result set into R.
-4.  Finally, use `data.table` for any subsequent high-performance manipulations on this in-memory R object before visualization or modeling.
-
-The key is to let each tool do what it does best at the appropriate stage of your data pipeline.
-
----
-
-## A Bird's-Eye View: Conceptual Analytical Workflow with Databases and R
-
-Understanding how database interactions fit into a broader data science project is essential. Here's a conceptual depiction of a typical analytical workflow where R and databases play pivotal roles:
-
-<div style="text-align:center;">
-<img src="https://placehold.co/850x550/E0EAFC/003D6B?text=1.+Define+Problem+%26+Data+Needs%0A%E2%86%93%0A2.+Connect+to+Data+Sources+(R+DBI,+APIs)%0A%E2%86%93%0A3.+Explore+Database+Schema%0A%C2%A0%C2%A0%C2%A0(dbListTables,+dbListFields,+ERDs)%0A%E2%86%93%0A4.+Query,+Filter,+Subset+%26+Aggregate%0A%C2%A0%C2%A0%C2%A0(SQL+or+dbplyr+%E2%80%93+Computation+on+DB+Server)%0A%C2%A0%C2%A0%C2%A0%E2%86%B3%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%E2%86%99%0A5a.+Collect+Results+into+R%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A05b.+Store+Intermediate+Results%0A%C2%A0%C2%A0%C2%A0%C2%A0(as+R+objects+or+files)%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0%C2%A0(as+new+DB+tables+via+compute())%0A%E2%86%93%0A6.+In-Depth+In-Memory+Analysis+in+R%0A%C2%A0%C2%A0%C2%A0(dplyr,+data.table,+skimr,+statistical+tests)%0A%E2%86%93%0A7.+Data+Visualization+(R+ggplot2,+plotly,+crosstalk)%0A%C2%A0%C2%A0%C2%A0(Static+%26+Interactive+Exploration)%0A%E2%86%93%0A8.+Statistical+Modeling+%26+Machine+Learning%0A%C2%A0%C2%A0%C2%A0(R+tidymodels,+mlr3,+caret,+stats+package,+etc.)%0A%E2%86%93%0A9.+Communicate+Insights+%26+Deploy%0A%C2%A0%C2%A0%C2%A0(RMarkdown+reports,+Shiny+apps,+APIs+via+plumber)%0A%E2%86%93%0A10.+Iterate+%26+Refine+(Return+to+earlier+steps+as+needed)&font=roboto" alt="Detailed Analytical Workflow with R and Databases" style="border-radius: 8px; max-width:100%; height:auto;">
-</div>
-
-**Elaboration on Key Stages:**
-* **Stages 1-3 (Setup & Understanding):** Clearly defining the analytical question and understanding the available data (its location, schema, relationships via Entity Relationship Diagrams - ERDs) is paramount before writing any code.
-* **Stage 4 (Database-Side Processing):** This is where `dbplyr` or SQL shines. Most heavy lifting (filtering billions of rows down to thousands, calculating group-wise summaries) happens here, on the powerful database server.
-* **Stage 5 (Data Ingress to R / Staging):** `collect()` brings manageable data into R. `compute()` or writing to new tables can be used for complex, multi-step database-side transformations before final collection.
-* **Stages 6-8 (R's Analytical Powerhouse):** Once data is in R, its rich ecosystem of packages for detailed statistical analysis, machine learning, and bespoke visualization comes into play.
-* **Stage 9 (Dissemination):** R Markdown is excellent for reproducible reports. Shiny allows building interactive web applications directly from R code, often backed by live database queries for dashboards. `plumber` can create APIs from R functions.
-* **Stage 10 (Iteration):** Data science is rarely linear. Insights from one stage often lead to new questions or data needs, prompting a return to earlier stages.
-
-This workflow highlights that database interaction is not an isolated task but an integral part of a larger analytical pipeline where R provides the glue and the advanced analytical capabilities.
-
----
-## Expanding Horizons: Advanced Topics and Future Directions in Data Management with R
-
-The world of data is constantly evolving. Beyond the core techniques we've discussed, several advanced topics and future directions are shaping how data scientists interact with large-scale data systems using R:
-
-* **Distributed Computing with `sparklyr` and `arrow` – Conquering Massive Datasets:**
-    * **`sparklyr`:** As mentioned, this R interface to Apache Spark enables R users to execute `dplyr` operations and arbitrary R code across a Spark cluster. This is essential when data volumes grow beyond the capacity of a single server (many terabytes or petabytes). You can perform distributed machine learning using Spark's MLlib via `sparklyr`.
-        * *Real-World Example:* Analyzing clickstream data from a major e-commerce website (billions of events per day) to build a real-time recommendation engine. The data processing and model training would be distributed across a Spark cluster, managed and scripted from R using `sparklyr`.
-    * **`arrow`:** The Apache Arrow project provides a standardized, language-agnostic columnar in-memory data format. The `arrow` R package allows for highly efficient data movement between R and other systems (like Python/Pandas, Spark, BigQuery), often with "zero-copy" reads for Parquet files or when sharing memory. It's also enabling on-disk datasets in R that can be larger than RAM, queried with `dplyr` syntax.
-        * *Relevance:* Faster data loading from disk (e.g., Parquet files, which are common in big data workflows), more efficient data sharing with Python colleagues, and the potential for out-of-memory `dplyr` operations on local machines.
-
-* **Navigating the Cloud: Scalable Databases & Data Warehouses:**
-    * Cloud platforms like Amazon Web Services (AWS), Google Cloud Platform (GCP), and Microsoft Azure offer a plethora of managed database services:
-        * **Relational Databases (RDS/Cloud SQL):** Managed versions of PostgreSQL, MySQL, SQL Server (e.g., Amazon RDS, Google Cloud SQL). R connects via standard drivers. *Benefit: Reduced DBA overhead, scalability, backups.*
-        * **Cloud Data Warehouses:** Designed for analytical workloads on massive datasets.
-            * *Google BigQuery:* A serverless, highly scalable, and cost-effective multi-cloud data warehouse. The `bigrquery` R package provides a direct interface.
-            * *Amazon Redshift:* A petabyte-scale data warehouse service.
-            * *Snowflake:* A popular cloud-native data warehouse.
-        * *Benefit:* These systems offer immense scalability (compute and storage), often with pay-as-you-go pricing, and are optimized for complex analytical queries over vast datasets. R acts as a powerful client for querying and retrieving results.
-
-* **Beyond Tables: Exploring NoSQL Databases with R:**
-    * While SQL databases are dominant, NoSQL ("Not Only SQL") databases are designed for specific use cases where relational models are less suitable (e.g., massive scale, flexible schema, unstructured data).
-        * **Document Databases (e.g., MongoDB):** Store data in flexible, JSON-like documents. Good for product catalogs, user profiles, content management. R can connect via `mongolite`.
-        * **Key-Value Stores (e.g., Redis, Amazon DynamoDB):** Simple, highly scalable stores for fast lookups.
-        * **Graph Databases (e.g., Neo4j):** For data with complex relationships, like social networks or recommendation systems. R packages like `RNeo4j` exist.
-    * *Relevance:* As data variety increases, data scientists may need to pull data from NoSQL sources. Understanding their paradigms and R connectors is becoming more important.
-
-* **Data Engineering Foundations: Database Design, Normalization, and ETL/ELT:**
-    * **Database Design & Normalization:** While often the domain of Data Engineers or DBAs, understanding basic principles of good relational database design (e.g., primary/foreign keys, avoiding data redundancy through normalization – 1NF, 2NF, 3NF) helps data scientists write more efficient queries and better understand data structures.
-    * **ETL (Extract, Transform, Load) / ELT (Extract, Load, Transform) Pipelines:** These are the processes for moving data from source systems, cleaning and transforming it, and loading it into target databases or data warehouses for analysis. R can be used to script parts of these pipelines, especially the Transform stage. Tools like `dbt` (Data Build Tool), often used with SQL, are also gaining popularity for managing transformations directly in the data warehouse, following an ELT approach.
-
-* **Upholding Responsibility: Security, Governance, and Ethical Considerations:**
-    * **Security:** Beyond parameterized queries, this includes robust authentication, authorization (role-based access control), encryption of data at rest and in transit, and regular security audits.
-    * **Data Governance:** Establishing policies and procedures for data quality, data lineage (tracking where data comes from and how it's transformed), metadata management, and compliance (e.g., GDPR, CCPA, Kenya's Data Protection Act).
-    * **Ethical AI and Bias:** When analyzing large datasets, especially those involving people, it's crucial to be aware of potential biases in the data or algorithms that could lead to unfair or discriminatory outcomes. Responsible data science includes actively working to mitigate these biases.
-
-Staying abreast of these advanced topics will ensure your R skills remain relevant and powerful in the ever-expanding Big Data landscape.
-
----
-
-## Solid Foundations: Reinforced Best Practices for Robust Data Work with R
-
-Adhering to best practices is crucial for creating data analysis workflows that are not only correct and efficient but also reproducible, maintainable, and secure. Let's reinforce these key principles:
-
-1.  **Minimize Data Transfer – The Golden Rule:**
-    * **Why:** Transferring large amounts of data between the database and R is often the biggest performance bottleneck. R's strength is analysis, not storing terabytes in memory.
-    * **How:** Aggressively filter data at the source using `WHERE` clauses (in SQL or `dbplyr::filter()`). `SELECT` only the specific columns you absolutely need for your R analysis. Perform aggregations (`GROUP BY ... SUM()/AVG()`, `dbplyr::summarise()`) and joins on the database side whenever feasible. The less data crosses the network and enters R's RAM, the faster and more stable your process will be.
-    * *Consequence of Ignoring:* R session crashing due to out-of-memory errors; extremely slow script execution; unnecessary network congestion.
-
-2.  **Understand Database Query Plans – Look Under the Hood:**
-    * **Why:** The database's query optimizer doesn't always make the perfect decision. Understanding its execution plan can reveal inefficiencies.
-    * **How:** Use the `EXPLAIN` command in SQL or `dbplyr::explain()`. Look for full table scans on large tables (bad, if an index could be used), inefficient join methods, or incorrect cardinality estimates.
-    * *Consequence of Ignoring:* Queries run orders of magnitude slower than they could, wasting valuable time and compute resources.
-
-3.  **Champion Database Indexing – Your Database's Superpower:**
-    * **Why:** Indexes allow the database to find specific rows or ranges of rows much faster than scanning the entire table. This is paramount for query performance on tables with thousands to billions of rows.
-    * **How:** While index creation is typically a DBA task, data scientists should understand which columns in their queries are good candidates for indexing (those frequently used in `WHERE` clauses, `JOIN` conditions, and `ORDER BY` clauses). Communicate these needs to your database team.
-    * *Consequence of Ignoring:* Sluggish queries, user frustration with slow dashboards, and an overloaded database server.
-
-4.  **Embrace Vectorized Operations in R – R's Native Speed:**
-    * **Why:** R is an interpreted language, and R-level loops (e.g., `for`, `while` operating on rows of a data frame) are notoriously slow for data manipulation because each iteration involves overhead. Vectorized functions, typically written in C or Fortran, operate on entire vectors (columns) at once, which is vastly more efficient.
-    * **How:** Use base R vectorized functions (`sum`, `mean`, arithmetic operators `+`, `-`, `*`, `/` on vectors), `dplyr` verbs, and `data.table` operations, all of which are designed to be vectorized.
-    * *Consequence of Ignoring:* R code that takes hours to run when a vectorized equivalent could run in seconds or minutes.
-
-5.  **Proactive Resource Management – Keep R and the DB Happy:**
-    * **Why:** Open database connections and unreleased query result sets consume resources both in R and on the database server. Too many open connections can exhaust the database's connection pool. Large R objects consume RAM.
-    * **How:**
-        * Always close database connections using `dbDisconnect(con)` when you are finished with them, preferably in a `tryCatch()` or `on.exit()` block to ensure closure even if errors occur.
-        * Always clear query result sets using `dbClearResult(res)` as soon as you have fetched all necessary data from them.
-        * In R, remove large objects that are no longer needed using `rm(object_name)` and periodically call `gc()` if you suspect memory fragmentation, though this is less critical than efficient object management.
-    * *Consequence of Ignoring:* R out-of-memory errors, database connection errors ("too many connections"), and a generally unstable analytical environment.
-
-6.  **Prioritize Code Readability and Version Control – For Your Future Self and Others:**
-    * **Why:** Your code will likely be read by others (or by you, months later). Clear, well-commented code is easier to understand, debug, and maintain. Version control is essential for tracking changes, collaborating, and reverting to previous states if something breaks.
-    * **How:**
-        * Write clean, well-formatted R and SQL code.
-        * Use meaningful variable and function names.
-        * Comment your code judiciously to explain the "why," not just the "what" (especially for complex logic).
-        * Use a version control system like Git for all your analytical projects. Commit changes frequently with descriptive messages. Platforms like GitHub, GitLab, or Bitbucket facilitate collaboration.
-    * *Consequence of Ignoring:* "Write-only" code that's impossible to understand later; difficulty collaborating; inability to revert to working versions if errors are introduced; wasted time deciphering old analyses.
-
-7.  **Adopt an Iterative Refinement Approach – Start Simple, Build Complexity:**
-    * **Why:** Tackling a complex data problem with a massive dataset all at once can be overwhelming and error-prone.
-    * **How:** Start by working with a small sample of your data or a simplified version of your problem. Get your logic working correctly on this smaller scale. Test your database queries on subsets (`LIMIT` clause) before running them on entire multi-billion row tables. Once you have confidence in your approach, gradually scale up to the full dataset or complexity.
-    * *Consequence of Ignoring:* Wasting hours running flawed queries on huge datasets; difficulty debugging complex logic; increased frustration.
-
-By internalizing and consistently applying these best practices, you will build more robust, efficient, and reliable data analysis solutions with R and databases.
-
----
-
-## Grand Synthesis: R as the Consummate Data Science Powerhouse for Database Integration
-
-Throughout this comprehensive exploration, we have witnessed R's profound capabilities as a first-class citizen in the world of big data and databases. Far from being limited to in-memory tasks, R, armed with its rich ecosystem of packages like `DBI`, `dbplyr`, `data.table`, `plotly`, and `crosstalk`, offers an exceptionally powerful, flexible, and user-friendly environment for sophisticated database interaction and large-scale data analysis.
-
-**Key Pillars of R's Strength in this Domain:**
-* **Seamless Connectivity and Abstraction:** `DBI` provides a consistent gateway to a vast array of database systems, simplifying development and enhancing code portability.
-* **Intelligent Database-Side Computation:** `dbplyr` empowers data scientists to leverage the immense processing power of database servers using familiar `dplyr` syntax, minimizing data movement and maximizing efficiency.
-* **High-Performance In-Memory Analytics:** `data.table` ensures that once data (or manageable subsets) is brought into R, it can be manipulated with lightning speed.
-* **Rich, Interactive Visualization:** `ggplot2`, `plotly`, and `crosstalk` transform raw data and database query results into compelling visual narratives and interactive exploratory tools.
-* **Unmatched Analytical Depth:** R's core strength remains its unparalleled collection of statistical, machine learning, and domain-specific analytical packages, ready to be applied to data sourced from any database.
-
-The journey of a data scientist involves not just building models but also skillfully sourcing, managing, processing, and interpreting data, often from complex and large-scale database systems. Mastering the art of database-side computation, efficient data retrieval strategies, and the subsequent in-R analysis and visualization is no longer optional—it is a hallmark of a proficient and impactful data professional.
-
-R provides the essential toolkit and the intellectual framework to bridge the worlds of robust data management and cutting-edge data science. By strategically leveraging the combined strengths of R's analytical prowess and the raw power of modern database technologies, you are equipped to tackle the most challenging data problems and unlock profound insights that drive innovation and value.
-
-**Empower your analyses. Transform data into wisdom. Achieve mastery with R and databases!**
-
-```{r disconnect_db_enhanced_wordy, include=FALSE}
-# Ensure disconnection from the database as a final cleanup step.
-if (exists("con") && inherits(con, "DBIConnection") && dbIsValid(con)) {
-  cat("\nDisconnecting from the database as part of cleanup.\n")
-  dbDisconnect(con)
+  data.table::fwrite(sim_transactions, "kenya_sim_transactions.csv")
+  rm(sim_transactions) # Remove from memory
+  gc()
+  cat("'kenya_sim_transactions.csv' created.\n")
+} else {
+  cat("'kenya_sim_transactions.csv' already exists.\n")
 }
 ```
 
----
+**Interpretation of Simulated Transaction Data:** We've created
 
-## Q & A – Discussion and Further Exploration
+`kenya_sim_transactions.csv` with 2 million rows, simulating a dataset of financial transactions.
 
-<div style="text-align:center; margin-top: 40px; padding-bottom: 20px;">
-<img src="https://placehold.co/450x300/E0EAFC/003D6B?text=Thank+You!%0AOpen+for+Questions+%26+Discussion&font=roboto" alt="Thank You - Questions and Discussion" style="border-radius: 8px;">
-</div>
+`transaction_id`: A unique ID for each transaction.
 
-**Daniel Wanjala Machimbo, MSc. Candidate**
-* Cooperative University of Kenya
-* GitHub: [github.com/MadScie254](https://github.com/MadScie254)
-* Portfolio: [danco-analytics.github.io/Portifolio/](https://danco-analytics.github.io/Portifolio/)
-* ORCID: [0009-0005-1979-8555](https://orcid.org/0009-0005-1979-8555)
-* LinkedIn: [in/daniel-wanjala-912b8b17b](https://www.linkedin.com/in/daniel-wanjala-912b8b17b/)
+`customer_id`: Identifier for the customer making the transaction.
 
+`transaction_amount_ksh`: The value of the transaction in Kenyan Shillings, simulated to follow a log-normal distribution (common for monetary values).
+
+`transaction_date`: The date of the transaction.
+
+`branch_code`: Code for the branch where the transaction occurred. This file size, while not enormous, is large enough to show performance differences in reading.
+
+```{r fread_demo_run}
+# Reading with data.table::fread()
+cat("Timing data.table::fread() to read 'kenya_sim_transactions.csv':\n")
+time_fread <- system.time({
+  dt_transactions <- data.table::fread("kenya_sim_transactions.csv", nThread = max(1, RcppParallel::defaultNumThreads() -1))
+})
+print(time_fread)
+cat("\nDimensions of data read by fread:", dim(dt_transactions), "\n")
+cat("Object size:", format(object.size(dt_transactions), units = "auto"), "\n")
+cat("First 3 rows of transaction data:\n")
+print(head(dt_transactions, 3))
+
+# For comparison, you could try base R's read.csv (it would be slower)
+time_read_csv <- system.time({
+   df_transactions_base <- read.csv("kenya_sim_transactions.csv")
+ })
+ print(time_read_csv) # This would show fread is much faster
+ rm(df_transactions_base) # Clean up if you run it
+
+rm(dt_transactions) # Clean up memory for next steps
+gc()
+```
+
+**Interpretation of `fread` Performance:**
+
+-   The `system.time()` output shows how long `fread` took to read the 2 million row CSV. The "elapsed" time is the key metric. `fread` is known for being significantly faster and more memory-efficient than base R's `read.csv()`.
+
+-   `dim(dt_transactions)` confirms that all 2 million rows and 5 columns were loaded.
+
+-   `object.size()` shows the memory footprint of the loaded data table in R.
+
+-   `head()` displays the first few rows, verifying the data was read correctly. The output matches our simulated structure.
+
+### Strategy 2: Processing Data in Chunks – `readr::read_csv_chunked()`
+
+When data is too vast to fit into memory even with `fread`, process it in manageable chunks.
+
+```{r read_csv_chunked_kenya_demo}
+# Callback function to process each chunk:
+# For example, calculate total transaction amount per branch from each chunk.
+results_list <- list() # To store results from each chunk
+
+chunk_processor_kenya <- function(chunk, pos) {
+  # cat("Processing chunk starting at position:", pos, "with", nrow(chunk), "rows\n") # For debugging
+  processed_chunk_summary <- as.data.table(chunk)[, .(Total_Amount_Ksh = sum(transaction_amount_ksh, na.rm = TRUE)), by = branch_code]
+  results_list <<- append(results_list, list(processed_chunk_summary))
+}
+
+cat("Processing 'kenya_sim_transactions.csv' in chunks of 500,000 rows:\n")
+read_csv_chunked(
+  "kenya_sim_transactions.csv",
+  callback = DataFrameCallback$new(chunk_processor_kenya),
+  chunk_size = 500000, # Process 500k rows at a time
+  progress = TRUE
+)
+
+# Combine results from all chunks
+if (length(results_list) > 0) {
+  final_branch_summary <- rbindlist(results_list)[, .(Grand_Total_Amount_Ksh = sum(Total_Amount_Ksh)), by = branch_code]
+  cat("\nAggregated transaction summary by branch (from all chunks):\n")
+  print(final_branch_summary[order(branch_code)])
+} else {
+  cat("\nNo results collected from chunks.\n")
+}
+rm(results_list, final_branch_summary)
+gc()
+```
+
+**Interpretation of Chunked Processing:**
+
+-   The `read_csv_chunked` function processes `kenya_sim_transactions.csv` not all at once, but in segments of 500,000 rows.
+
+-   The `chunk_processor_kenya` function is applied to each segment. Inside this function, we convert the chunk to a `data.table` and calculate the sum of `transaction_amount_ksh` for each `branch_code` *within that chunk*.
+
+-   The `results_list` accumulates these per-chunk summaries.
+
+-   After all chunks are processed, `rbindlist(results_list)` combines these intermediate summaries. The subsequent `data.table` operation `[, .(Grand_Total_Amount_Ksh = sum(Total_Amount_Ksh)), by = branch_code]` then calculates the final total transaction amount for each branch across *all* chunks.
+
+-   The output table shows the `branch_code` and the `Grand_Total_Amount_Ksh` derived by this chunked approach. This demonstrates how to compute aggregates on a file too large to load entirely, by processing it piece by piece.
+
+    ### Strategy 3: The `data.table` Package – Power and Speed In-Memory
+
+If data *can* fit in RAM (perhaps after `fread`), `data.table` provides a very fast and memory-efficient syntax for manipulation. `DT[i, j, by]`
+
+`i`: Row filtering (like `WHERE` in SQL) \* `j`: Column selection/computation (like `SELECT` in SQL) `by`: Grouping (like `GROUP BY` in SQL)
+
+```{r datatable_ops_kenya_demo}
+# Re-read the transaction data for data.table operations
+dt_transactions_ops <- data.table::fread("kenya_sim_transactions.csv", nThread = max(1, RcppParallel::defaultNumThreads() -1))
+cat("Transaction data loaded into data.table, dimensions:", dim(dt_transactions_ops), "\n")
+
+# Example 1: Find average transaction amount and count for transactions in January 2023
+cat("\nAggregating January 2023 transactions with data.table:\n")
+# Convert transaction_date to Date type if it's not already (fread usually does this well)
+if(!inherits(dt_transactions_ops$transaction_date, "Date")) {
+  dt_transactions_ops[, transaction_date := as.IDate(transaction_date)] # Use IDate for efficiency
+}
+
+jan_summary_dt <- dt_transactions_ops[
+  format(transaction_date, "%Y-%m") == "2023-01", # i: filter for January 2023
+  .(avg_amount_ksh = mean(transaction_amount_ksh), num_transactions = .N), # j: compute mean and count
+  by = branch_code # by: group by branch
+][order(branch_code)] # Chain an order operation
+
+print(jan_summary_dt)
+
+# Example 2: Add a column: transaction fee (e.g., 0.5% of amount, capped at 50 Ksh)
+# This modifies dt_transactions_ops by reference (efficient!)
+dt_transactions_ops[, transaction_fee_ksh := pmin(transaction_amount_ksh * 0.005, 50)]
+
+cat("\nFirst few transactions with the new 'transaction_fee_ksh' column:\n")
+print(dt_transactions_ops[1:5, .(transaction_id, transaction_amount_ksh, transaction_fee_ksh)])
+
+rm(dt_transactions_ops, jan_summary_dt)
+gc()
+```
+
+**Interpretation of `data.table` Operations:**
+
+-   `jan_summary_dt`: This `data.table` operation first filters rows where `transaction_date` falls in "2023-01" (`i` argument). Then, for these filtered rows, it calculates the average transaction amount (`avg_amount_ksh`) and the count of transactions (`num_transactions`), grouping the results by `branch_code` (`by` argument). The output table shows these statistics for each branch for January 2023. For instance, BRANCH001 had `num_transactions` transactions in January 2023 with an `avg_amount_ksh`.
+
+-   The second operation demonstrates adding a new column `transaction_fee_ksh` *in-place*. The fee is calculated as 0.5% of the `transaction_amount_ksh`, but capped at a maximum of 50 Ksh (using `pmin`). The `:=` operator in `data.table` is key for this efficient, by-reference modification. The printed head of the table shows this new fee calculated for the first few transactions.
+
+### Strategy 4: `arrow` Package – Beyond-Memory Analytics & Efficient File Formats
+
+The Apache Arrow project (and its R package `arrow`) is a game-changer for:
+
+-   **Columnar Memory Format:** Efficient for analytics.
+
+-   **Zero-Copy Reads:** Fast data access between systems (e.g., R and Python).
+
+-   **Parquet File Format:** Highly compressed, columnar storage ideal for big data.
+
+-   **Larger-than-Memory Datasets:** `arrow` can query datasets stored on disk (e.g., in Parquet format) using `dplyr` syntax, without loading everything into R's RAM.
+
+```{r arrow_kenya_demo_setup}
+# Using the flights data for a larger example
+# Imagine this is a massive log of Safaricom data bundles usage across counties, partitioned by month.
+data(flights, package = "nycflights13") # Load ~336k rows
+
+# Path for our Arrow dataset (will be a directory)
+kenya_sim_usage_arrow_path <- "kenya_sim_usage_pq"
+
+# Clean up if it exists from a previous run
+if (dir.exists(kenya_sim_usage_arrow_path)) {
+  unlink(kenya_sim_usage_arrow_path, recursive = TRUE)
+}
+
+cat("Writing simulated usage data (using flights data) to Parquet, partitioned by month...\n")
+# For this simulation, let's rename some columns to fit a "usage" scenario
+flights_renamed <- flights %>%
+  select(
+    user_id = flight, # Treat flight number as a user ID
+    county_code = origin, # Origin airport as a county code
+    usage_mb = distance, # Distance as data usage in MB
+    year, month, day, hour
+  )
+
+write_dataset(
+  dataset = flights_renamed,
+  path = kenya_sim_usage_arrow_path,
+  format = "parquet",
+  partitioning = c("year", "month") # Partition data into folders by year/month
+)
+cat("Simulated usage data written as partitioned Parquet dataset to:", kenya_sim_usage_arrow_path, "\n")
+```
+
+**Interpretation of `arrow` Setup:**
+
+-   We're repurposing the `nycflights13::flights` data to simulate a "Kenyan data usage" scenario. Columns are renamed: `flight` becomes `user_id`, `origin` becomes `county_code`, and `distance` becomes `usage_mb`. This helps in contextualizing.
+
+-   `write_dataset(...)` is the key `arrow` function here. It takes the `flights_renamed` data frame and writes it to disk in the **Parquet format**. Parquet is columnar, highly efficient for storage and analytical queries. \* `partitioning = c("year", "month")`: This is crucial. `arrow` will create a directory structure within `kenya_sim_usage_pq` like `year=2013/month=1/part-0.parquet`, `year=2013/month=2/part-0.parquet`, etc. This partitioning allows `arrow` to read only the necessary data files when queries involve filters on `year` or `month`, dramatically speeding up queries on very large datasets.
+
+```{r arrow_kenya_demo_query}
+# Open the Parquet dataset (this does NOT load all data into RAM)
+sim_usage_ds <- open_dataset(kenya_sim_usage_arrow_path, format = "parquet")
+
+cat("\nSchema of the Arrow dataset (on disk):\n")
+print(sim_usage_ds) # Shows schema and partitioning keys
+
+# Query with dplyr: Total usage in MB for "county" JFK in Jan & Feb 2013
+# This query is processed by Arrow's engine, often without pulling all data into R
+total_usage_jfk_janfeb <- sim_usage_ds %>%
+  filter(county_code == "JFK" & month %in% c(1, 2)) %>% # Filters applied efficiently due to partitioning
+  summarise(total_usage_for_jfk_jan_feb_mb = sum(usage_mb, na.rm = TRUE)) %>%
+  collect() # Collect the final single aggregated value
+
+cat("\nTotal simulated data usage (MB) for 'County JFK' in Jan/Feb 2013:\n")
+print(total_usage_jfk_janfeb)
+
+# Example: Top 3 counties by average usage per user in March 2013
+avg_usage_march <- sim_usage_ds %>%
+  filter(month == 3) %>%
+  group_by(county_code) %>%
+  summarise(
+    avg_mb_per_user = mean(usage_mb, na.rm = TRUE),
+    distinct_users = n_distinct(user_id) # Arrow translates n_distinct
+  ) %>%
+  filter(distinct_users > 100) %>% # Only counties with enough users
+  arrange(desc(avg_mb_per_user)) %>%
+  head(3) %>% # Get top 3 in the Arrow query itself
+  collect()
+
+cat("\nTop 3 'Counties' by average usage (MB) per user in March 2013 (simulated):\n")
+print(avg_usage_march)
+
+# Clean up the Arrow dataset directory
+if (dir.exists(kenya_sim_usage_arrow_path)) {
+  unlink(kenya_sim_usage_arrow_path, recursive = TRUE)
+}
+rm(sim_usage_ds, total_usage_jfk_janfeb, avg_usage_march, flights_renamed)
+gc()
+```
+
+**Interpretation of `arrow` Querying:** \* `open_dataset()` creates `sim_usage_ds`, an `Arrow Dataset` object. This is a pointer to the data on disk; the data isn't loaded into RAM yet. The printout of `sim_usage_ds` confirms its schema and highlights the partitioning keys (`year`, `month`). \* `total_usage_jfk_janfeb`: The `dplyr` query filters for `county_code == "JFK"` and `month %in% c(1, 2)`. Because the data is partitioned by `month` (and `year`), Arrow's engine can intelligently scan only the relevant Parquet files (those for January and February). The `sum(usage_mb)` aggregation is performed by Arrow, and only the final single sum is `collect()`ed into R. \* `avg_usage_march`: This demonstrates a more complex query: filtering for March, grouping by `county_code`, calculating average usage and distinct user counts, filtering again, ordering, and taking the top 3. All these steps are translated by `arrow` into an efficient execution plan that operates on the Parquet files. The `collect()` brings only the final small result (top 3 counties) into R. This is immensely powerful for large datasets.
+
+### Strategy 5: Visualizing Large Data – Beyond the Blur
+
+Plotting millions of points directly leads to overplotting.
+
+Techniques:
+
+**Sampling:** Plot a subset.
+
+**Aggregation/Binning:** `geom_bin2d()` (rectangles), `geom_hex()` (hexagons).
+
+**Transparency (`alpha`):** Reveals density.
+
+```{r viz_large_kenya_demo}
+# Simulate data for visualization: e.g., locations of many small businesses in a city
+set.seed(123)
+num_businesses <- 75000
+biz_locations <- data.frame(
+  # Simulate coordinates within a hypothetical city grid (e.g., Nairobi CBD and surroundings)
+  longitude = rnorm(num_businesses, mean = 36.82, sd = 0.05), # Centered around Nairobi's approx longitude
+  latitude = rnorm(num_businesses, mean = -1.29, sd = 0.05),  # Centered around Nairobi's approx latitude
+  biz_type = sample(c("Retail", "Food", "Service", "Other"), num_businesses, replace = TRUE, prob = c(0.4, 0.3, 0.2, 0.1))
+)
+
+cat("Simulated business locations data (first 3 rows):\n")
+print(head(biz_locations, 3))
+
+# Standard scatter plot - will be heavily overplotted
+p_overplot <- ggplot(biz_locations, aes(x = longitude, y = latitude)) +
+  geom_point(size = 0.3, stroke=0) + # stroke=0 removes point border for denser look
+  labs(title = "Simulated Business Locations (75k points) - Overplotted",
+       x = "Longitude (Simulated)", y = "Latitude (Simulated)") +
+  theme_minimal()
+print(p_overplot)
+
+# Scatter plot with alpha transparency
+p_alpha <- ggplot(biz_locations, aes(x = longitude, y = latitude)) +
+  geom_point(size = 0.3, alpha = 0.05, stroke=0) + # Low alpha to show density
+  labs(title = "Business Locations with Alpha Transparency",
+       x = "Longitude (Simulated)", y = "Latitude (Simulated)") +
+  theme_minimal()
+print(p_alpha)
+
+# Hexagonal binning plot
+p_hex <- ggplot(biz_locations, aes(x = longitude, y = latitude)) +
+  geom_hex(bins = 60) + # Adjust 'bins' for different granularity
+  scale_fill_viridis_c(name = "Business\nDensity") + # Using viridis for colorblind-friendly scale
+  labs(title = "Business Locations - Hexagonal Binning",
+       x = "Longitude (Simulated)", y = "Latitude (Simulated)") +
+  theme_minimal()
+print(p_hex)
+
+rm(biz_locations, p_overplot, p_alpha, p_hex)
+gc()
+```
+
+**Interpretation of Visualization Strategies:**
+
+-   `Simulated business locations data`: We created a dataset with 75,000 points, each having a simulated longitude, latitude, and business type, conceptually representing businesses in a city like Nairobi.
+
+-   `p_overplot`: The first plot attempts a standard scatter plot. With 75,000 points, it becomes a dense, mostly black area where individual points and density variations are hard to discern. This is **overplotting**.
+
+-   `p_alpha`: The second plot uses the same points but with `alpha = 0.05`. This makes each point highly transparent. Where many points overlap, the color becomes more opaque. This technique helps reveal areas of high density (darker regions) versus sparse areas (lighter regions) much better than the first plot.
+
+-   `p_hex`: The third plot uses `geom_hex()`. Instead of plotting individual points, it divides the plotting area into hexagonal bins. The color of each hexagon represents the number of data points falling within it (the density). This is an excellent way to show the spatial distribution of a large number of points, clearly highlighting "hotspots" of business concentration. The `viridis` color scale is used for better visual perception.
+
+------------------------------------------------------------------------
+
+# Epilogue: Your R Journey Continues (Approx. 3 minutes)(Kunywa maji, or breath in)
+
+## Key Insights Distilled:
+
+**Databases in R:** They are the bedrock for reliable, scalable data storage.
+
+`DBI` is your universal key; `dbplyr` is your fluent R-to-SQL translator.
+
+Push computations to the database whenever possible for efficiency.
+
+**Big Data in R:**
+
+It's about overcoming memory and speed limitations.
+
+**No single solution:** Employ a toolkit:
+
+Fast I/O: `data.table::fread()`.
+
+Chunking: `readr::read_csv_chunked()` for out-of-memory processing.
+
+In-memory muscle: `data.table` syntax for speed.
+
+Beyond-memory analytics & efficient formats: `arrow` with Parquet.
+
+Smart visualization: Aggregate or use transparency.
+
+**Think strategically:** Sample, summarize, and select data wisely.
+
+## The "Creative Genius" in You:
+
+Mastering these tools is one part. The true "genius" emerges when you:
+
+1\. **Ask questions** of your data.
+
+2\. **Combine tools creatively** to solve complex problems.
+
+3\. **Clearly communicate** your findings, supported by robust analysis.
+
+4\. **Apply these techniques to real-world Kenyan challenges and opportunities** – from public health and agriculture to finance and urban planning.
+
+The data landscape is vast and ever-growing. With R as your compass and these strategies as your guide, you are well-equipped to navigate it.
+
+Asante sana! Thank you!
+
+------------------------------------------------------------------------
+
+# Q&A
+
+*(Open for questions)*
+
+------------------------------------------------------------------------
+
+```{r final_cleanup, include=FALSE, echo=FALSE}
+# Clean up simulated files created during the presentation
+if (file.exists("kenya_sim_transactions.csv")) {
+  unlink("kenya_sim_transactions.csv")
+}
+if (dir.exists("kenya_sim_usage_pq")) {
+  unlink("kenya_sim_usage_pq", recursive = TRUE)
+}
+```
