@@ -1,5 +1,5 @@
 ---
-title: "Illuminating Data: Mastering Databases and Big Data with R"
+title: "Mastering Databases and Big Data with R"
 subtitle: "A Comprehensive Guide with Kenyan Perspectives"
 author: "Daniel Wanjala Machimbo"
 date: "Presentation Date: May 20, 2025 (Content Prepared: `r Sys.Date()`)"
@@ -11,7 +11,7 @@ output:
     theme: cosmo # A clean, modern theme
     highlight: pygments # Syntax highlighting style
     df_print: kable # Nicely formatted data frames
-    code_folding: hide # Users can expand code
+    code_folding: hide #can expand code
 ---
 
 ```{r setup, include=FALSE}
@@ -46,7 +46,7 @@ Karibu! Today, we explore the powerful capabilities of R in managing and analyzi
 
 A quick note on the datasets we'll use:
 
-1.  **Simulated Kenyan Scenarios:** To make concepts directly relatable, we will create small, illustrative datasets within our R code. These will mimic real-world Kenyan contexts (e.g., county statistics, transactional data).These are *not* official KNBS datasets but are crafted for clear demonstration.
+1.  **Simulated Kenyan Scenarios:** To make concepts directly relatable, we will create small, illustrative datasets within our R code. These will mimic real-world Kenyan contexts (e.g., county statistics, transactional data).These are ***NOT*** official KNBS datasets but are crafted for clear demonstration.
 
 2.  **Standard R Packages:** We'll also use datasets from established R packages like `nycflights13`. While US-centric, the principles of handling this data (e.g., millions of flight records) are directly transferable to analyzing, say, transportation logs from the Kenya National Highways Authority (KeNHA) or logistics data for a large distributor.
 
@@ -84,7 +84,7 @@ The `DBI` (Database Interface) package is the cornerstone of database interactio
 
 3\. `dbListTables()`: See what tables exist in the database.
 
-4. `dbGetQuery()`: Send an SQL query and retrieve all results as an R data frame.
+4.  `dbGetQuery()`: Send an SQL query and retrieve all results as an R data frame.
 
 5\. `dbSendQuery()`, `dbFetch()`: For more granular control, especially with large results (send query, then fetch results in pieces).
 
